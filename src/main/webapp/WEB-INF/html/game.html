@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Browser Card Game</title>
+	<style type="text/css">
+		@import url("game.css");
+		@import url("dijit/themes/dijit.css");
+	</style>
+</head>
+<body>
+	<div id="table"></div>
+	<div id="overlay">
+		<div id="overlayText">Waiting for other player...</div>
+	</div>
+	<script type="text/javascript" src="dojo/dojo.js"
+		data-dojo-config="async: true"></script>
+	<script type="text/javascript">
+		require([ "bcg/Game", "dojo/domReady!" ], function(Game) {
+			new Game();
+		});
+	</script>
+</body>
+</html>
+

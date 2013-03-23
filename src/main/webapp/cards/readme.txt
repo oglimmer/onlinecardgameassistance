@@ -1,0 +1,1 @@
+put here all small cards (80x65). must match file names from Core.xml
