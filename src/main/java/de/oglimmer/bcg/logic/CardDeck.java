@@ -10,8 +10,6 @@ public class CardDeck extends CardList implements JSONTransformable {
 
 	// private static final Logger log = LoggerFactory.getLogger(Cards.class);
 
-	private static final String EMPTY_CARDS_IMG = "cards/Star Wars LCG - 0000.jpg";
-
 	private int x;
 	private int y;
 	private Player owner;
@@ -31,13 +29,13 @@ public class CardDeck extends CardList implements JSONTransformable {
 		JSONObject json = new JSONObject();
 		String imageUrl;
 		if (getCards().isEmpty()) {
-			imageUrl = EMPTY_CARDS_IMG;
+			imageUrl = CardsFactory.EMPTY_CARDS_IMG;
 		} else {
 			Card c = getCards().get(0);
 			if (c.isFaceup()) {
 				imageUrl = c.getImageUrl();
 			} else {
-				imageUrl = "cards/" + c.getBackImageUrl();
+				imageUrl = c.getBackImageUrl();
 			}
 		}
 		json.element("imageUrl", imageUrl);
@@ -54,14 +52,29 @@ public class CardDeck extends CardList implements JSONTransformable {
 			Collection<String> menu = new ArrayList<>();
 			switch (getName()) {
 			case "discard pile":
-				menu.add("Take top card into hand:takeCardIntoHand:deck");
+				menu.add("~Discard Pile");
+				menu.add("-");
 				menu.add("Play card face up on table:takeCardPlayOnTable:up");
+				menu.add("Take top card into hand:takeCardIntoHand:deck");
 				break;
 			case "command deck":
-			case "objective deck":
+				menu.add("~Command Deck");
+				menu.add("-");
 				menu.add("Take top card into hand:takeCardIntoHand:deck");
+				menu.add("-");
 				menu.add("Play card face up on table:takeCardPlayOnTable:up");
 				menu.add("Play card face down on table:takeCardPlayOnTable:down");
+				menu.add("-");
+				menu.add("Shuffle:shuffle");
+				break;
+			case "objective deck":
+				menu.add("~Objective Deck");
+				menu.add("-");
+				menu.add("Take top card into hand:takeCardIntoHand:deck");
+				menu.add("-");
+				menu.add("Play card face up on table:takeCardPlayOnTable:up");
+				menu.add("Play card face down on table:takeCardPlayOnTable:down");
+				menu.add("-");
 				menu.add("Shuffle:shuffle");
 				break;
 			}

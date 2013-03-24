@@ -17,18 +17,16 @@ public class Player implements JSONTransformable {
 
 	private CardsSet cardStacks;
 
-	private String side;
+	private Side side;
 
 	private boolean connected;
 
-	public Player(int no, Game game, String side, String cardBackgroundUrl,
-			String forceImageUrl, InputStream deckStream) {
+	public Player(int no, Game game, Side side, InputStream deckStream) {
 		this.id = RandomString.getRandomStringASCII(8);
 		this.no = no;
 		this.game = game;
 		this.side = side;
-		cardStacks = new CardsSet(game, this, cardBackgroundUrl, forceImageUrl,
-				deckStream, no);
+		cardStacks = new CardsSet(game, this, deckStream, no);
 	}
 
 	public Game getGame() {
@@ -43,7 +41,7 @@ public class Player implements JSONTransformable {
 		return no;
 	}
 
-	public String getSide() {
+	public Side getSide() {
 		return side;
 	}
 

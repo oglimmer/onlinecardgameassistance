@@ -15,10 +15,9 @@ public class CardsSet {
 
 	private Map<String, CardList> cards = new HashMap<>();
 
-	public CardsSet(Game game, Player player, String cardBackgroundUrl,
-			String forceImageUrl, InputStream deckStream, int playerNo) {
-		CardsFactory cf = new CardsFactory(game, player, cards,
-				cardBackgroundUrl, forceImageUrl, deckStream, playerNo);
+	public CardsSet(Game game, Player player, InputStream deckStream,
+			int playerNo) {
+		CardsFactory cf = new CardsFactory(game, player, cards, deckStream);
 		cf.createDecks();
 	}
 

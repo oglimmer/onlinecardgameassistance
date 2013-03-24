@@ -50,7 +50,6 @@ return declare(null, {
 		if(toDestroy!==null) {
 			domConstruct.destroy(toDestroy);
 		}
-		//dom.byId("IMG"+v.discardId).src = v.imageUrl;
 		this.messageHandler(v);
 	},
 	
@@ -65,7 +64,7 @@ return declare(null, {
 			}).play();
 		}
 		
-		dom.byId("IMG"+v.id).src = v.imageUrl;
+		dom.byId("IMG"+v.id).src = "cards/"+ v.imageUrl;
 		
 		this.menuHandler.removeMenu(v.id);
 		
@@ -118,8 +117,8 @@ return declare(null, {
 		
 		this.menuHandler.addMenu(v, v.menu);
 		
-		if(dom.byId("IMG"+v.id).src != v.imageUrl) {
-			dom.byId("IMG"+v.id).src  = v.imageUrl;
+		if(dom.byId("IMG"+v.id).src != "cards/"+v.imageUrl) {
+			dom.byId("IMG"+v.id).src  = "cards/"+v.imageUrl;
 		}
 		
 		this.messageHandler(v);
@@ -169,12 +168,19 @@ return declare(null, {
 	},
 	
 	createCardZoom: function(c, v) {
+		function removeZoomCard() {
+			var toDestroy = dom.byId("ZOOMCARD");
+			if(toDestroy!==null) {
+				domConstruct.destroy(toDestroy);
+			}
+		}		
 		on(c, "mouseover", function(e) {
 			var imgNode = dom.byId("IMG"+v.id);
 			if(imgNode!=null) {
+				removeZoomCard();
 				domConstruct.create("img", {				
 					src : imgNode.src.replace(/cards/g, "cardsLarge"),
-					id : "LARGE"+v.id,
+					id : "ZOOMCARD",
 					style : {
 						zIndex: 1,
 						position : "absolute",
@@ -185,11 +191,8 @@ return declare(null, {
 			}
 		});
 		on(c, "mouseout", function(e) {
-			var toDestroy = dom.byId("LARGE"+v.id);
-			if(toDestroy!==null) {
-				domConstruct.destroy(toDestroy);
-			}
-		});		
+			removeZoomCard();
+		});	
 	},
 	
 	createDivImage: function(v, areaNode) {
@@ -203,7 +206,7 @@ return declare(null, {
 			}
 		}, areaNode);
 		domConstruct.create("img", {
-			src : v.imageUrl,
+			src : "cards/"+v.imageUrl,
 			id: "IMG"+v.id,
 			style : {
 				position: "absolute",
@@ -216,8 +219,8 @@ return declare(null, {
 			id: "TXT"+v.id,
 			style : {				
 				position: "absolute",
-				top: "25px",
-				left: "5px",
+				left: ((typeof(v.counterPosX) != 'undefined')?v.counterPosX:"8")+"px",
+				top: ((typeof(v.counterPosY) != 'undefined')?v.counterPosY:"25")+"px",
 				width: "60px",
 				fontWeight: "bolder",
 				fontSize: "20px",
@@ -239,25 +242,16 @@ return declare(null, {
 		if(typeof(v.counter0)!='undefined'&&typeof(v.counter1)!='undefined'&&typeof(v.counter2)!='undefined') {
 			html = "";
 			var dataFound = false;
-			if(v.counter0!=null&&v.counter0!="0"){
-				html += v.counter0;
-				dataFound = true;
-			} else {
-				html += "-";
-			}
-			html += "/";
-			if(v.counter1!=null&&v.counter1!="0"){
-				html += v.counter1;
-				dataFound = true;
-			} else {
-				html += "-";
-			}
-			html += "/";
-			if(v.counter2!=null&&v.counter2!="0"){
-				html += v.counter2;
-				dataFound = true;
-			} else {
-				html += "-";
+			for(var i = 0 ; i < 3 ; i++) {
+				if(html!="") {
+					html += "/";	
+				}
+				if(v["counter"+i]!=null&&v["counter"+i]!="0"){
+					html += v["counter"+i];
+					dataFound = true;
+				} else {
+					html += "-";
+				}
 			}
 			if(!dataFound) {
 				html = "";

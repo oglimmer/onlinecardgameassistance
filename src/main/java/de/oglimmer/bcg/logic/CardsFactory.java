@@ -22,6 +22,11 @@ import org.xml.sax.SAXException;
 
 public class CardsFactory {
 
+	private static final String COMMITED_FORCE_LIGHT = "Star Wars LCG Light - 0000b.jpg";
+	private static final String COMMITED_FORCE_DARK = "Star Wars LCG Dark - 0000b.jpg";
+	private static final String DEFAULT_BACKGROUND_LIGHT = "Star Wars LCG Light - 0001.jpg";
+	private static final String DEFAULT_BACKGROUND_DARK = "Star Wars LCG Dark - 0001.jpg";
+	public static final String EMPTY_CARDS_IMG = "Star Wars LCG - 0000.jpg";
 	private static final Logger log = LoggerFactory
 			.getLogger(CardsFactory.class);
 
@@ -34,15 +39,17 @@ public class CardsFactory {
 	private int playerNo;
 
 	public CardsFactory(Game game, Player owner, Map<String, CardList> cards,
-			String cardBackgroundUrl, String forceImageUrl,
-			InputStream deckStream, int playerNo) {
+			InputStream deckStream) {
+
 		this.game = game;
 		this.owner = owner;
 		this.cards = cards;
-		this.cardBackgroundUrl = cardBackgroundUrl;
-		this.forceImageUrl = forceImageUrl;
 		this.deckStream = deckStream;
-		this.playerNo = playerNo;
+		this.cardBackgroundUrl = (owner.getSide() == Side.DARK ? DEFAULT_BACKGROUND_DARK
+				: DEFAULT_BACKGROUND_LIGHT);
+		this.forceImageUrl = (owner.getSide() == Side.DARK ? COMMITED_FORCE_DARK
+				: COMMITED_FORCE_LIGHT);
+		this.playerNo = owner.getNo();
 	}
 
 	public void createDecks() {
@@ -73,13 +80,13 @@ public class CardsFactory {
 			Card balanceCard = new BalanceOfTheForceCard();
 			balanceCard.setFaceup(true);
 			balanceCard.setX(10);
-			balanceCard.setY(300);
+			balanceCard.setY(298);
 			cards.get("table").getCards().add(balanceCard);
 
 			Card deathStarDialCard = new DeathStarDialCard();
 			deathStarDialCard.setFaceup(true);
-			deathStarDialCard.setX(10);
-			deathStarDialCard.setY(400);
+			deathStarDialCard.setX(5);
+			deathStarDialCard.setY(364);
 			cards.get("table").getCards().add(deathStarDialCard);
 		}
 	}
@@ -101,14 +108,14 @@ public class CardsFactory {
 		// directly to the table
 		Card affiCard = affiliationDeck.getCards().get(0);
 		affiCard.setFaceup(true);
-		affiCard.setX(affiCard.getX() + 100 * playerNo);
+		affiCard.setX(affiCard.getX() + 200 * playerNo);
 		cards.get("table").getCards().add(affiCard);
 
 		for (int i = 0; i < 3; i++) {
 			Card force = new CommitForceCard(owner, forceImageUrl);
 			force.setFaceup(true);
 			force.setY(200);
-			force.setX(affiCard.getX() + 100 * playerNo + i * 20);
+			force.setX(force.getX() + 200 * playerNo + i * 20);
 			cards.get("table").getCards().add(force);
 		}
 	}
@@ -187,8 +194,13 @@ public class CardsFactory {
 		NodeList nl = doc.getElementsByTagName("Relationship");
 		for (int i = 0; i < nl.getLength(); i++) {
 			Node n = nl.item(i);
-			ret.put(n.getAttributes().getNamedItem("Id").getNodeValue(), n
-					.getAttributes().getNamedItem("Target").getNodeValue());
+			String longFileName = n.getAttributes().getNamedItem("Target")
+					.getNodeValue();
+			if (longFileName.startsWith("/cards/")) {
+				longFileName = longFileName.substring(7);
+			}
+			ret.put(n.getAttributes().getNamedItem("Id").getNodeValue(),
+					longFileName);
 		}
 
 		return ret;
@@ -213,9 +225,6 @@ public class CardsFactory {
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 
-		// Document deckDoc =
-		// dBuilder.parse(this.getClass().getResourceAsStream(
-		// "/" + deckFilename));
 		deckStream.reset();// we read more than once
 		Document deckDoc = dBuilder.parse(deckStream);
 		deckDoc.getDocumentElement().normalize();
@@ -230,8 +239,7 @@ public class CardsFactory {
 				String idAsInDef = n.getAttributes().getNamedItem("id")
 						.getNodeValue();
 				String idAsInRef = "C" + idAsInDef.replace("-", "");
-				// start with /, but we need relative
-				String filename = idMap.get(idAsInRef).substring(1);
+				String filename = idMap.get(idAsInRef);
 				for (int j = 0; j < Integer.parseInt(qty); j++) {
 					ret.add(filename);
 				}

@@ -25,11 +25,12 @@ public class PlayCardOnTableAction extends AbstractAction implements Action {
 	}
 
 	private void sendOtherPlayer(Game game, Player otherPlayer,
-			ClientChannel cc, Card card, boolean faceUp) {
+			ClientChannel cc, Card card, boolean faceUp, int playerHandCards) {
 		JSONObject cardJSON = send(game, otherPlayer, card);
 		cardJSON.element("owner", false);
 		cardJSON.element("infoText", "Opponent played a card face "
-				+ (faceUp ? "up" : "down") + " from hand to table");
+				+ (faceUp ? "up" : "down") + " from hand(" + playerHandCards
+				+ ") to table");
 
 		send(otherPlayer, cc, "createCard", cardJSON);
 	}
@@ -49,7 +50,7 @@ public class PlayCardOnTableAction extends AbstractAction implements Action {
 		sendPlayer(game, player, cc, card, faceUp);
 
 		sendOtherPlayer(game, game.getPlayers().getOther(player), cc, card,
-				faceUp);
+				faceUp, cardStacks.get("hand").getCards().size());
 	}
 
 }

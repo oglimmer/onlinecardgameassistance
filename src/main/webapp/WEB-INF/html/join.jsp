@@ -10,7 +10,7 @@
 	JSONArray decksList = (JSONArray) session.getAttribute("deckList");
 	String gameId = request.getParameter("gameId");
 	String otherSide = GameManager.INSTANCE.getGame(gameId)
-			.getPlayers().getPlayer(0).getSide();
+			.getPlayers().getPlayer(0).getSide().toString();
 %>
 <html>
 <head>
@@ -29,7 +29,7 @@
 			<%
 				boolean validDeckFound = false;
 				for(JSONObject deck : (Collection<JSONObject>)decksList) {
-					if(!deck.getString("side").equals(otherSide) && deck.getBoolean("valid")){
+					if(!deck.getString("side").equalsIgnoreCase(otherSide) && deck.getBoolean("valid")){
 						validDeckFound = true;
 			%>		
 						<option value="<%=deck.getString("id")%>"><%= deck.getString("name")+" ("+deck.getString("side")+")"%></option>

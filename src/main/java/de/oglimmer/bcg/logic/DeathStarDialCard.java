@@ -7,7 +7,7 @@ import net.sf.json.JSONObject;
 public class DeathStarDialCard extends Card {
 
 	public DeathStarDialCard() {
-		super(null, null, "cards/death-star-dial.png", "death-star-dial.png");
+		super(null, null, "death-star-dial.png", "death-star-dial.png");
 	}
 
 	@Override
@@ -20,6 +20,13 @@ public class DeathStarDialCard extends Card {
 	@Override
 	protected void handleJSONPayloadCounter(JSONObject card) {
 		card.element("counter0", getCounter(0));
+	}
+
+	@Override
+	protected void handleJSONPayloadBase(Player player, JSONObject card) {
+		super.handleJSONPayloadBase(player, card);
+		card.element("counterPosX", "68");
+		card.element("counterPosY", "18");
 	}
 
 }

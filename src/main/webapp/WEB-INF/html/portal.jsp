@@ -2,7 +2,7 @@
 <%@page import="de.oglimmer.bcg.logic.GameManager"%>
 <%@page import="de.oglimmer.bcg.logic.Game"%>
 <%@page pageEncoding="utf-8" contentType="text/html;charset=utf-8"
-	session="true"%>
+	session="true"%>	
 <html>
 <head>
 <title>Browser Card Game</title>
@@ -16,7 +16,11 @@
 
 
 	<div style="border:3px solid black;padding:5px;font-family:Arial;margin-bottom:5px;">
+		<% if( (Boolean)session.getAttribute("permissionStartGame") ) { %>
 		To start a new game click <button onclick="document.location.href='start.htm'">here</button><br/><br/><br/>
+		<% } else { %>
+		You are not authorized to start a game, but you can wait until somebody else created one.<br/><br/><br/>
+		<% } %>
 		
 		To join another game select one 
 		<select id="gameList">

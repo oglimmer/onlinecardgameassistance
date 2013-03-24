@@ -14,10 +14,8 @@ public class Players {
 		this.game = game;
 	}
 
-	public synchronized Player createPlayer(String side, String background,
-			String forceImageUrl, InputStream deckStream) {
-		Player p = new Player(players.size(), game, side, background,
-				forceImageUrl, deckStream);
+	public synchronized Player createPlayer(Side side, InputStream deckStream) {
+		Player p = new Player(players.size(), game, side, deckStream);
 		players.add(p);
 		return p;
 	}

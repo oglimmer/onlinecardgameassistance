@@ -9,7 +9,7 @@
 		<servlet-name>ControlServlet</servlet-name>
 		<servlet-class>de.oglimmer.bcg.servlet.ControlServlet</servlet-class>
 	</servlet>
-	
+
 	<servlet-mapping>
 		<servlet-name>ControlServlet</servlet-name>
 		<url-pattern>*.htm</url-pattern>
@@ -19,6 +19,10 @@
 		<display-name>GameContextListener</display-name>
 		<listener-class>de.oglimmer.bcg.servlet.GameContextListener</listener-class>
 	</listener>
+
+	<session-config>
+		<session-timeout>240</session-timeout>
+	</session-config>
 
 	<welcome-file-list>
 		<welcome-file>index.jsp</welcome-file>

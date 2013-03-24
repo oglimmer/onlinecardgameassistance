@@ -7,7 +7,7 @@ import net.sf.json.JSONObject;
 public class BalanceOfTheForceCard extends Card {
 
 	public BalanceOfTheForceCard() {
-		super(null, null, "cards/balance_light.jpg", "balance_dark.jpg");
+		super(null, null, "balance_light.jpg", "balance_dark.jpg");
 	}
 
 	@Override

@@ -7,7 +7,7 @@ import net.sf.json.JSONObject;
 public class CommitForceCard extends Card {
 
 	public CommitForceCard(Player player, String imageUrl) {
-		super(player, null, "cards/" + imageUrl, imageUrl);
+		super(player, null, imageUrl, imageUrl);
 	}
 
 	@Override

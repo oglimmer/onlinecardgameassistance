@@ -8,8 +8,11 @@
 	<div style="border:3px solid black;padding:5px;font-family:Arial;margin-bottom:5px;">
 		Online came game assistance
 	</div>
+	<% if(request.getAttribute("reason")!=null) { %>
+	<h1 style="border:3px solid red;padding:5px;font-family:Arial;"><%=request.getAttribute("reason") %></h1>
+	<% } %>
 	<div style="border:3px solid black;padding:5px;font-family:Arial">
-		<a href="/">To register an account and build a deck go here</a><br/><br/>
+		
 		<form action="login.htm" method="POST">		
 			Email:<br/><input type="text" name="email" /><br/>
 			Password:<br/><input type="password" name="password" /><br/>

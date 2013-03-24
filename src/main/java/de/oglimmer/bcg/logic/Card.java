@@ -106,7 +106,7 @@ public class Card implements JSONTransformable {
 		if (faceup) {
 			card.element("imageUrl", imageUrl);
 		} else {
-			card.element("imageUrl", "cards/" + backImageUrl);
+			card.element("imageUrl", backImageUrl);
 		}
 
 		Collection<String> menu = new ArrayList<>();
@@ -127,19 +127,24 @@ public class Card implements JSONTransformable {
 		if (owner == null || owner == player) {
 			if (!faceup) {
 				menu.add("Face up:flipCard");
+				menu.add("-");
 			}
 			switch (player.getGame().getBoard().getArea(this)) {
 			case "hand":
 				menu.add("Play card face up on table:playCardOnTable:up");
 				menu.add("Play card face down on table:playCardOnTable:down");
+				menu.add("-");
 				menu.add("Put card on top of command deck:returnToDeck:top");
 				menu.add("Put card under command deck:returnToDeck:bottom");
 				break;
 			case "table":
 				menu.add("Rotate card:rotateCard");
+				menu.add("-");
 				menu.add("Put card on top of command deck:returnToDeck:top");
 				menu.add("Put card under command deck:returnToDeck:bottom");
+				menu.add("-");
 				menu.add("Take top card into hand:takeCardIntoHand:card");
+				menu.add("-");
 				menu.add("+1 Resource:modCounter:add-0");
 				menu.add("-1 Resource:modCounter:sub-0");
 				menu.add("+1 Damage:modCounter:add-1");
@@ -148,6 +153,7 @@ public class Card implements JSONTransformable {
 				menu.add("-1 Shield:modCounter:sub-2");
 				break;
 			}
+			menu.add("-");
 			menu.add("Discard card:discardCard");
 		}
 	}

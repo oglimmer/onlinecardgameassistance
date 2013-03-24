@@ -1,5 +1,5 @@
-define([ "dojo/_base/declare", "dojo/_base/array", "dijit/Menu", "dijit/MenuItem", "dojo/_base/lang" ], 
-		function(declare, arrayUtil, Menu, MenuItem, lang) {
+define([ "dojo/_base/declare", "dojo/_base/array", "dijit/Menu", "dijit/MenuItem", "dijit/MenuSeparator", "dojo/_base/lang" ], 
+		function(declare, arrayUtil, Menu, MenuItem, MenuSeparator, lang) {
 
 return declare(null, {
 
@@ -16,12 +16,22 @@ return declare(null, {
 	    });
 		this.menuToNodeMapping[node] = pMenu;
 		arrayUtil.forEach(entries, function(item, index) {
-		    pMenu.addChild(new MenuItem({
-		        label: item.label,
-		        onClick: function(){
-		        	item.fnct(item.params);
-		        }
-		    }));
+			if(item.label=="-") {
+				pMenu.addChild(new MenuSeparator());
+			} else {				
+				var disabled = false;
+				if(item.label.charAt(0) == "~"){
+					disabled = true;
+					item.label = item.label.substring(1);
+				}
+			    pMenu.addChild(new MenuItem({
+			        label: item.label,
+			        disabled: disabled,
+			        onClick: function(){
+			        	item.fnct(item.params);
+			        }
+			    }));
+			}
 		});
 	    pMenu.startup();				
 	},
@@ -44,17 +54,20 @@ return declare(null, {
 		var self = this;
 		var menuData = new Array();
 		arrayUtil.forEach(menu, function(item, index) {
-			var splits = item.split(":");
+			var splits = item.split(":");			
 			var name = splits[0];
-			var action = "send"+splits[1].substr(0,1).toUpperCase()+splits[1].substr(1);
-			var fnct = self.remoteMsgSender[action];
-			if(typeof(fnct)=='undefined' || fnct==null) {
-				console.log(action);
-			}
-			fnct = fnct.bind(self.remoteMsgSender);
-			if(typeof(splits[2]) != 'undefined') {
-				v = lang.clone(v);
-				lang.mixin(v, { "param": splits[2] });
+			var fnct = null;			
+			if(name.charAt(0)!="~" && name!="-") {
+				var action = "send"+splits[1].substr(0,1).toUpperCase()+splits[1].substr(1);
+				fnct = self.remoteMsgSender[action];
+				if(typeof(fnct)=='undefined' || fnct==null) {
+					console.log(action);
+				}
+				fnct = fnct.bind(self.remoteMsgSender);
+				if(typeof(splits[2]) != 'undefined') {
+					v = lang.clone(v);
+					lang.mixin(v, { "param": splits[2] });
+				}
 			}
 			menuData.push({
 				label : name,
