@@ -14,8 +14,9 @@ public class Players {
 		this.game = game;
 	}
 
-	public synchronized Player createPlayer(Side side, InputStream deckStream) {
-		Player p = new Player(players.size(), game, side, deckStream);
+	public synchronized Player createPlayer(String key, Side side,
+			InputStream deckStream) {
+		Player p = new Player(players.size(), key, game, side, deckStream);
 		players.add(p);
 		return p;
 	}
@@ -60,6 +61,15 @@ public class Players {
 			}
 		}
 		return false;
+	}
+
+	public boolean isNobodyConnected() {
+		for (Player p : players) {
+			if (p.isConnected()) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 }

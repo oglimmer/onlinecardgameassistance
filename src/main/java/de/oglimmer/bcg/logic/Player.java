@@ -10,20 +10,20 @@ public class Player implements JSONTransformable {
 	// private static final Logger log = LoggerFactory.getLogger(Player.class);
 
 	private int no;
-
 	private String id;
-
+	private String key;
 	private Game game;
-
 	private CardsSet cardStacks;
-
 	private Side side;
-
 	private boolean connected;
+	private int browserWidth;
+	private int browserHeight;
 
-	public Player(int no, Game game, Side side, InputStream deckStream) {
+	public Player(int no, String key, Game game, Side side,
+			InputStream deckStream) {
 		this.id = RandomString.getRandomStringASCII(8);
 		this.no = no;
+		this.key = key;
 		this.game = game;
 		this.side = side;
 		cardStacks = new CardsSet(game, this, deckStream, no);
@@ -41,6 +41,10 @@ public class Player implements JSONTransformable {
 		return no;
 	}
 
+	public String getKey() {
+		return key;
+	}
+
 	public Side getSide() {
 		return side;
 	}
@@ -55,6 +59,22 @@ public class Player implements JSONTransformable {
 
 	public boolean isConnected() {
 		return connected;
+	}
+
+	public void setBrowserWidth(int browserWidth) {
+		this.browserWidth = browserWidth;
+	}
+
+	public void setBrowserHeight(int browserHeight) {
+		this.browserHeight = browserHeight;
+	}
+
+	public int getBrowserWidth() {
+		return browserWidth;
+	}
+
+	public int getBrowserHeight() {
+		return browserHeight;
 	}
 
 	/**

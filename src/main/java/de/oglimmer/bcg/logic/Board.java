@@ -84,7 +84,7 @@ public class Board {
 		cardStacksPlayer = player1.getCardStacks();
 		mainBa.addCardDeck((CardDeck) cardStacksPlayer.get("discard"));
 
-		mainBa.setCss("{\"backgroundImage\": \"url(images/wood.jpg)\",\"height\": \"80%\"}");
+		mainBa.setCss("{\"backgroundImage\": \"url(images/wood.jpg)\",\"height\": \"76%\"}");
 		areas.add(mainBa);
 	}
 
@@ -94,7 +94,7 @@ public class Board {
 		allPlayers = infoBa.getVisibleFor();
 		allPlayers.add(player1);
 		allPlayers.add(player0);
-		infoBa.setCss("{\"backgroundColor\":\"black\",\"color\":\"white\", \"height\":\"20%\","
+		infoBa.setCss("{\"backgroundColor\":\"black\",\"color\":\"white\", \"height\":\"24%\","
 				+ "\"width\":\"30%\",\"overflow\":\"auto\",\"float\":\"left\"}");
 		areas.add(infoBa);
 	}
@@ -107,7 +107,7 @@ public class Board {
 		boardArea.addCardDeck((CardDeck) cardStacksPlayer.get("command"));
 		boardArea.addCardDeck((CardDeck) cardStacksPlayer.get("objective"));
 		boardArea.setCss("{\"backgroundImage\": \"url(images/metal.jpg)\","
-				+ "\"height\": \"20%\",\"width\":\"70%\",\"float\":\"left\"}");
+				+ "\"height\": \"24%\",\"width\":\"70%\",\"float\":\"left\"}");
 		areas.add(boardArea);
 	}
 

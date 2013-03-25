@@ -18,7 +18,8 @@ public class InitAction extends AbstractAction implements Action {
 
 	private void createTableCards(Game game, Player player, List<Object[]> msg) {
 		for (Card card : player.getCardStacks().get("table").getCards()) {
-			JSONObject json = card.toJSON(player, JSONPayload.BASE, JSONPayload.COUNTER);
+			JSONObject json = card.toJSON(player, JSONPayload.BASE,
+					JSONPayload.COUNTER);
 			json.element("areaId", game.getBoard().getArea("table").getId());
 			json.element("owner", card.isOwner(player));
 			msg.add(new Object[] { "createCard", json });
@@ -35,10 +36,6 @@ public class InitAction extends AbstractAction implements Action {
 		}
 	}
 
-	/**
-	 * This action must not send data to the other player since it might not be
-	 * initialized yet.
-	 */
 	@Override
 	public void execute(Game game, final Player player, JSONObject parameters,
 			ClientChannel cc) {

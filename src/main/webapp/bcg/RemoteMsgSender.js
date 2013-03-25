@@ -1,4 +1,4 @@
-define([ "dojo/_base/declare", "dojo/_base/lang" ], function(declare, lang) {
+define([ "dojo/_base/declare", "dojo/_base/lang", "dojo/window" ], function(declare, lang, window) {
 
 	return declare(null, {
 
@@ -85,8 +85,11 @@ define([ "dojo/_base/declare", "dojo/_base/lang" ], function(declare, lang) {
 		},
 
 		sendPreInitMsg : function() {
-			this.sendMsg("preinit", {});
-			console.log("sendInitMsg done");
+			var vs = window.getBox();
+			this.sendMsg("preinit", {
+				browserWidth: vs.w,
+				browserHeight: vs.h
+			});			
 		},		
 
 		sendMsg : function(actionId, additionalParams) {

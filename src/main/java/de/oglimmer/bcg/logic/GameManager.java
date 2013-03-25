@@ -2,6 +2,7 @@ package de.oglimmer.bcg.logic;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -20,31 +21,38 @@ public enum GameManager {
 	private GameManager() {
 	}
 
-	public Game getGame(String id) {
+	public synchronized Game getGame(String id) {
 		Game game = games.get(id);
 		if (game == null) {
 			throw new GameException("There is no game with id='" + id + "'");
 		}
+		game.setLastAccess(new Date());
 		return game;
 	}
 
-	public Game createGame() {
+	public synchronized Game createGame() {
 		Game game = new Game();
 		games.put(game.getId(), game);
 		return game;
 	}
 
-	public Collection<Game> getAllGames() {
+	public synchronized Collection<Game> getOpenGames() {
 		Collection<Game> ret = new ArrayList<>();
-		for (Game g : games.values()) {
-			if (!g.getPlayers().isPlayersReady()) {
+		for (Iterator<Game> it = games.values().iterator(); it.hasNext();) {
+			Game g = it.next();
+			// remove games which are orphaned for more than a day
+			if (System.currentTimeMillis() - g.getLastAccess().getTime() > 1000 * 60 * 60 * 24
+					&& g.getPlayers().isNobodyConnected()) {
+				log.debug("Removed game " + g);
+				it.remove();
+			} else if (!g.getPlayers().isPlayersReady()) {
 				ret.add(g);
 			}
 		}
 		return ret;
 	}
 
-	public Game getGame(Player ply) {
+	public synchronized Game getGame(Player ply) {
 		for (Game g : games.values()) {
 			if (g.getPlayers().contains(ply)) {
 				return g;
@@ -53,7 +61,19 @@ public enum GameManager {
 		return null;
 	}
 
-	public void remove(Game game) {
+	public synchronized Collection<Player> getGamesRegistered(String playerKey) {
+		Collection<Player> ret = new ArrayList<>();
+		for (Game g : games.values()) {
+			for (Player p : g.getPlayers().getPlayers()) {
+				if (p.getKey().equals(playerKey)) {
+					ret.add(p);
+				}
+			}
+		}
+		return ret;
+	}
+
+	public synchronized void remove(Game game) {
 		for (Iterator<Map.Entry<String, Game>> it = games.entrySet().iterator(); it
 				.hasNext();) {
 			Map.Entry<String, Game> me = it.next();

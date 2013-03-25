@@ -9,15 +9,19 @@
 	</style>
 </head>
 <body>
+	<div id="borderX"></div>
+	<div id="borderY"></div>
 	<div id="table"></div>
 	<div id="overlay">
-		<div id="overlayText">Waiting for other player...</div>
+		<div id="overlayText">Waiting for other player...<br/><br/>Name of this game: </div>
 	</div>
+	<script type="text/javascript" src="jsExtra/ba-throttle-debounce.min.js"></script>
 	<script type="text/javascript" src="dojo/dojo.js"
 		data-dojo-config="async: true"></script>
 	<script type="text/javascript">
-		require([ "bcg/Game", "dojo/domReady!" ], function(Game) {
-			new Game();
+		require([ "bcg/Board", "dojo/domReady!" ], function(Board) {
+			var board = new Board();
+			board.create();
 		});
 	</script>
 </body>

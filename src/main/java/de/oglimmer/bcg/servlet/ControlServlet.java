@@ -122,14 +122,16 @@ public class ControlServlet extends HttpServlet {
 			game = GameManager.INSTANCE.getGame(gameId);
 		}
 
-		Player player = game.getPlayers().createPlayer(side, deckStream);
+		Player player = game.getPlayers().createPlayer(
+				(String) req.getSession().getAttribute("email"), side,
+				deckStream);
 
 		if (game.getPlayers().isPlayersReady()) {
 			game.createBoard();
 		}
 
 		resp.sendRedirect("game.htm?gameId=" + game.getId() + "&playerId="
-				+ player.getId());
+				+ player.getId() + "&name=" + game.getName());
 	}
 
 	private Document getDocFromSession(HttpServletRequest req)

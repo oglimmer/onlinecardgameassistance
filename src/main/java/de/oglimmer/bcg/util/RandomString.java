@@ -10,6 +10,12 @@ import java.util.Random;
  */
 final public class RandomString {
 
+	private static final String[] alphabet = { "Alfa", "Bravo", "Charlie",
+			"Delta", "Echo", "Foxtrot", "Golf", "Hotel", "India", "Juliett",
+			"Kilo", "Lima", "Mike", "November", "Oscar", "Papa", "Quebec",
+			"Romeo", "Sierra", "Tango", "Uniform", "Victor", "Whiskey", "Xray",
+			"Yankee", "Zulu" };
+
 	private RandomString() {
 		// no code here
 	}
@@ -97,4 +103,21 @@ final public class RandomString {
 		return getRandomString(size, "0123456789ABCDEF");
 	}
 
+	/**
+	 * 
+	 * 
+	 * @param size
+	 * @return
+	 */
+	public static String getReadableString(int size) {
+		final StringBuilder buff = new StringBuilder(size * 8);
+		for (int i = 0; i < size; i++) {
+			if (i > 0) {
+				buff.append('-');
+			}
+			int rand = RAN.nextInt(alphabet.length);
+			buff.append(alphabet[rand]);
+		}
+		return buff.toString();
+	}
 }

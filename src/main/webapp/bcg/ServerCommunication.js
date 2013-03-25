@@ -1,5 +1,5 @@
-define(["dojox/socket", "dojo/io-query", "dojo/_base/declare" ],
-		function(Socket, ioQuery, declare) {
+define(["dojox/socket", "dojo/io-query", "dojo/_base/declare", "dojo/dom" ],
+		function(Socket, ioQuery, declare, dom) {
 
 			return declare(null, {
 
@@ -24,7 +24,11 @@ define(["dojox/socket", "dojo/io-query", "dojo/_base/declare" ],
 					this.queryObject = ioQuery.queryToObject(document.URL
 							.substring(document.URL.indexOf("?") + 1,
 									document.URL.length));
-
+					
+					var overlayTextNode = dom.byId("overlayText");
+					overlayTextNode.innerHTML = overlayTextNode.innerHTML + this.queryObject.name;
+					dom.byId("overlay").style.display = "block";
+					
 					this.socket = Socket({
 						url : wsUrl,
 						headers : {
@@ -36,8 +40,7 @@ define(["dojox/socket", "dojo/io-query", "dojo/_base/declare" ],
 					this.remoteMsgSender.socket = this.socket;
 					this.remoteMsgSender.queryObject = this.queryObject;
 
-					self.socket.on("open", function(e) {
-						console.log("WS opened!");
+					self.socket.on("open", function(e) {						
 						self.socket.on("message", self.onMessage.bind(self));
 						self.socket.on("error", self.onError.bind(self));
 						self.socket.on("close", self.onClose.bind(self));

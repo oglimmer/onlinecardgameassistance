@@ -1,5 +1,7 @@
 package de.oglimmer.bcg.logic;
 
+import java.util.Date;
+
 import de.oglimmer.bcg.util.RandomString;
 
 public class Game {
@@ -7,10 +9,16 @@ public class Game {
 	private String id;
 	private Players players;
 	private Board board;
+	private String name;
+	private Date created;
+	private Date lastAccess;
 
 	public Game() {
 		this.id = RandomString.getRandomStringASCII(8);
+		this.name = RandomString.getReadableString(4);
 		this.players = new Players(this);
+		this.created = new Date();
+		this.lastAccess = this.created;
 	}
 
 	public void createBoard() {
@@ -31,19 +39,20 @@ public class Game {
 		return board;
 	}
 
-	public boolean checkForRemoval() {
-		// not all players are created
-		if (!getPlayers().isPlayersReady()) {
-			GameManager.INSTANCE.remove(this);
-			return true;
-		}
-		// no player is currently connected
-		if (!getPlayers().getPlayer(0).isConnected()
-				&& !getPlayers().getPlayer(1).isConnected()) {
-			GameManager.INSTANCE.remove(this);
-			return true;
-		}
-		return false;
+	public String getName() {
+		return name;
+	}
+
+	public Date getCreated() {
+		return created;
+	}
+
+	public Date getLastAccess() {
+		return lastAccess;
+	}
+
+	public void setLastAccess(Date lastAccess) {
+		this.lastAccess = lastAccess;
 	}
 
 }

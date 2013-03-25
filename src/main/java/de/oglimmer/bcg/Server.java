@@ -21,7 +21,6 @@ import de.oglimmer.bcg.com.ActionMessage;
 import de.oglimmer.bcg.com.ClientChannel;
 import de.oglimmer.bcg.com.ComConst;
 import de.oglimmer.bcg.logic.Game;
-import de.oglimmer.bcg.logic.GameException;
 import de.oglimmer.bcg.logic.GameManager;
 import de.oglimmer.bcg.logic.Player;
 
@@ -56,7 +55,7 @@ public class Server extends WebSocketServer implements ClientChannel {
 				toRemove.setConnected(false);
 				log.debug("removed player " + toRemove + " from webSocketMap");
 				commMap.remove(toRemove);
-				sendPlayerLeftMsg(toRemove);
+				playerLeft(toRemove);
 			}
 		}
 	}
@@ -107,8 +106,8 @@ public class Server extends WebSocketServer implements ClientChannel {
 			log.debug("response to " + p.getNo() + ": " + str);
 			WebSocket ws = commMap.get(p);
 			if (ws == null) {
-				throw new GameException("Player " + p
-						+ " is not registered with a WebSocket");
+				log.info("Player " + p + " is not registered with a WebSocket");
+				return;
 			}
 			ws.send(str);
 		} catch (NotYetConnectedException | IllegalArgumentException e) {
@@ -116,17 +115,24 @@ public class Server extends WebSocketServer implements ClientChannel {
 		}
 	}
 
-	private void sendPlayerLeftMsg(Player toRemove) {
+	private void playerLeft(Player toRemove) {
 		Game game = GameManager.INSTANCE.getGame(toRemove);
 		if (game != null) {
-			if (!game.checkForRemoval()) {
-				JSONArray msg = new JSONArray();
-				JSONObject m = new JSONObject();
-				JSONObject mO = new JSONObject();
-				m.element("infoText", "Other player left");
-				mO.element("message", m);
-				msg.add(mO);
-				send(game.getPlayers().getOther(toRemove), msg);
+			if (!game.getPlayers().isPlayersReady()) {
+				// remove a game, where the first player leaves before the
+				// second joins
+				GameManager.INSTANCE.remove(game);
+			} else {
+				Player otherPlayer = game.getPlayers().getOther(toRemove);
+				if (otherPlayer.isConnected()) {
+					JSONArray msg = new JSONArray();
+					JSONObject m = new JSONObject();
+					JSONObject mO = new JSONObject();
+					m.element("infoText", "Other player left");
+					mO.element("message", m);
+					msg.add(mO);
+					send(otherPlayer, msg);
+				}
 			}
 		}
 	}

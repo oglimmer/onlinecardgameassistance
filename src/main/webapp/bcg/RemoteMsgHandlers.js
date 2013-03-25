@@ -1,7 +1,7 @@
 define([ "dojo/dom", "dojo/fx", "dojo/dom-construct", "dojox/css3/fx",
 				"bcg/Moveable", "dojo/_base/declare", "dojo/_base/array", "dojo/on", 
-				"dojo/query", "./MenuHandler" ], 
-function(dom, fx, domConstruct, cssFx, Moveable, declare, arrayUtil, on, query, MenuHandler) {
+				"dojo/query", "./MenuHandler", "dojo/window" ], 
+function(dom, fx, domConstruct, cssFx, Moveable, declare, arrayUtil, on, query, MenuHandler, win) {
 	
 return declare(null, {
 	
@@ -15,14 +15,29 @@ return declare(null, {
 	},
 	
 	errorHandler: function(v) {
-		dom.byId("overlay").style.visibility = "";
+		dom.byId("overlay").style.display = "block";
 		dom.byId("overlayText").innerHTML = "Error:<br/><br/>"+v+"<br/><br/><a href='portal.htm'>Back to main screen</a>";
 	},
 	
 	initHandler: function(v) {
-		// if the table is already populated, ignore an init msg
+		if(win.getBox().w > v.browserWidth) {
+			var borderNode = dom.byId("borderX");
+			borderNode.style.width = (v.browserWidth*1)+"px";
+			borderNode.style.top = (v.browserHeight*0.76)+"px";
+		}
+		if(win.getBox().h > v.browserHeight) {
+			borderNode = dom.byId("borderY");
+			borderNode.style.left = (v.browserWidth*1)+"px";
+			borderNode.style.height = (v.browserHeight*0.76)+"px";
+		}
+		
+		// if the table is already populated, ignore an init msg		
 		if(dom.byId("table").innerHTML == "") {
 			this.remoteMsgSender.sendInitMsg();
+			var self = this;
+			on(window, "resize", Cowboy.debounce( 1000, function(e) {
+				self.remoteMsgSender.sendPreInitMsg();
+			}));
 		}
 	},
 	
@@ -143,7 +158,7 @@ return declare(null, {
 	/* answer from init */
 	createDivsHandler: function(v) {
 		var self = this;
-		dom.byId("overlay").style.visibility = "hidden";
+		dom.byId("overlay").style.display = "none";
 		dom.byId("table").innerHTML ="";
 		arrayUtil.forEach(v, function(item, index) {
 						
