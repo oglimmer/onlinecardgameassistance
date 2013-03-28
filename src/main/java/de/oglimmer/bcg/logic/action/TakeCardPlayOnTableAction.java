@@ -6,6 +6,7 @@ import java.util.List;
 import net.sf.json.JSONObject;
 import de.oglimmer.bcg.com.ClientChannel;
 import de.oglimmer.bcg.logic.Card;
+import de.oglimmer.bcg.logic.CardDeck;
 import de.oglimmer.bcg.logic.CardList;
 import de.oglimmer.bcg.logic.Game;
 import de.oglimmer.bcg.logic.JSONPayload;
@@ -19,12 +20,12 @@ public class TakeCardPlayOnTableAction extends AbstractAction implements Action 
 		List<Object[]> msg = new ArrayList<>();
 
 		JSONObject cardJSON = card.toJSON(player, JSONPayload.BASE);
-		cardJSON.element("areaId", game.getBoard().getArea("table").getId());
+		cardJSON.element("areaId", "table");
 		cardJSON.element("owner", owner);
-		cardJSON.element("infoText", text);
+		player.processMessage(cardJSON, text);
 		msg.add(new Object[] { "createCard", cardJSON });
 
-		if (owner) {
+		if (owner || CardDeck.DECKNAME_DISCARD.equals(cards.getName())) {
 			checkDeckMinus(player, cards, msg);
 		}
 

@@ -6,7 +6,7 @@ function(dom, fx, domConstruct, cssFx, Moveable, declare, arrayUtil, on, query, 
 return declare(null, {
 	
 	remoteMsgSender: null,
-	idFromInfo:null,
+	idFromMessages:null,
 	menuHandler:null,
 	
 	constructor: function(remoteMsgSender) {
@@ -20,15 +20,21 @@ return declare(null, {
 	},
 	
 	initHandler: function(v) {
+		var borderNode = dom.byId("borderX");
 		if(win.getBox().w > v.browserWidth) {
-			var borderNode = dom.byId("borderX");
 			borderNode.style.width = (v.browserWidth*1)+"px";
 			borderNode.style.top = (v.browserHeight*0.76)+"px";
+		} else {
+			borderNode.style.width = "0px";
+			borderNode.style.top = "0px";			
 		}
+		borderNode = dom.byId("borderY");
 		if(win.getBox().h > v.browserHeight) {
-			borderNode = dom.byId("borderY");
 			borderNode.style.left = (v.browserWidth*1)+"px";
 			borderNode.style.height = (v.browserHeight*0.76)+"px";
+		} else {
+			borderNode.style.left = "0px";
+			borderNode.style.height = "0px";			
 		}
 		
 		// if the table is already populated, ignore an init msg		
@@ -41,22 +47,43 @@ return declare(null, {
 		}
 	},
 	
+	toggleHighlightHandler: function(v) {
+		var toHighlight = dom.byId(v.id);
+		if(v.hl) {
+			toHighlight.style.border = "3px solid yellow";
+			toHighlight.style.boxShadow= "3px 3px 1px #888888";
+		} else {
+			toHighlight.style.border = "";
+			toHighlight.style.boxShadow= "";
+		}
+		this.messageHandler(v);
+		this.infoHandler(v);
+	},
+	
 	removeHandler: function(v) {
 		var toDestroy = dom.byId(v.id);
 		if(toDestroy!==null) {
 			domConstruct.destroy(toDestroy);
 		}
 		this.messageHandler(v);
+		this.infoHandler(v);
 	},
 	
 	modCounterHandler: function(v) {
 		dom.byId("TXT"+v.id).innerHTML = this.getCounter(v);
 		this.messageHandler(v);
+		this.infoHandler(v);
+	},
+	
+	infoHandler: function(v) {		
+		if(typeof(v.infoText) != 'undefined') {
+			dom.byId("info").innerHTML = v.infoText;
+		}
 	},
 	
 	messageHandler: function(v) {
-		if(typeof(v.infoText) != 'undefined') {
-			domConstruct.create("li", {innerHTML: v.infoText}, this.idFromInfo, "first");
+		if(typeof(v.messageItem) != 'undefined') {
+			domConstruct.create("li", {innerHTML: v.messageItem}, this.idFromMessages, "first");
 		}
 	},
 	
@@ -66,6 +93,7 @@ return declare(null, {
 			domConstruct.destroy(toDestroy);
 		}
 		this.messageHandler(v);
+		this.infoHandler(v);
 	},
 	
 	/* called from: FlipCardAction (your/other card), ReturnToDeckAction/TakeCardPlayOnTableAction/TakeCardIntoHandAction (deck) */
@@ -86,6 +114,7 @@ return declare(null, {
 		this.menuHandler.addMenu(v, v.menu);
 		
 		this.messageHandler(v);
+		this.infoHandler(v);
 	},
 	
 	/* answer from sendRotateCard for your and opponents cards*/
@@ -109,6 +138,7 @@ return declare(null, {
 			}).play();
 		}
 		this.messageHandler(v);
+		this.infoHandler(v);
 	},
 	
 	/* answer from a mouse move for opponents cards */
@@ -137,6 +167,7 @@ return declare(null, {
 		}
 		
 		this.messageHandler(v);
+		this.infoHandler(v);
 	},
 	
 	/* answer from takeCardIntoHand or sendPlayCardOnTable for opponents cards */	
@@ -153,6 +184,7 @@ return declare(null, {
 		}
 		
 		this.messageHandler(v);
+		this.infoHandler(v);
 	},
 	
 	/* answer from init */
@@ -168,9 +200,9 @@ return declare(null, {
 				"style" : item.css
 			}, dom.byId("table"));
 			
-			if(item.name=='info') {
-				self.idFromInfo = item.id;
-				newDiv.id = "infoDiv";
+			if(item.id=='messages') {
+				self.idFromMessages = item.id;
+				newDiv.id = "messagesDiv";
 				newDiv = domConstruct.create("ul", {
 					id: item.id
 				}, newDiv);
@@ -217,17 +249,13 @@ return declare(null, {
 				zIndex: 2,
 				position : "absolute",
 				top : v.y+"px",
-				left : v.x+"px"
+				left : v.x+"px",
+				borderRadius: "5px"				
 			}
 		}, areaNode);
 		domConstruct.create("img", {
 			src : "cards/"+v.imageUrl,
-			id: "IMG"+v.id,
-			style : {
-				position: "absolute",
-				top: "0px",
-				left: "0px"
-			}
+			id: "IMG"+v.id			
 		}, card);
 		domConstruct.create("div", {
 			innerHTML: this.getCounter(v),
@@ -244,6 +272,11 @@ return declare(null, {
 				color:"#000"
 			}
 		}, card);
+		
+		if(v.hl) {
+			card.style.border = "3px solid yellow";
+			card.style.boxShadow= "3px 3px 1px #888888";
+		}
 		
 		this.createCardZoom(card, v);
 		

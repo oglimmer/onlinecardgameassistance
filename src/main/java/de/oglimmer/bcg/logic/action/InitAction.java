@@ -20,7 +20,7 @@ public class InitAction extends AbstractAction implements Action {
 		for (Card card : player.getCardStacks().get("table").getCards()) {
 			JSONObject json = card.toJSON(player, JSONPayload.BASE,
 					JSONPayload.COUNTER);
-			json.element("areaId", game.getBoard().getArea("table").getId());
+			json.element("areaId", "table");
 			json.element("owner", card.isOwner(player));
 			msg.add(new Object[] { "createCard", json });
 		}
@@ -29,11 +29,19 @@ public class InitAction extends AbstractAction implements Action {
 	private void createHandCards(Game game, Player player, List<Object[]> msg) {
 		for (Card card : player.getCardStacks().get("hand").getCards()) {
 			JSONObject json = card.toJSON(player, JSONPayload.BASE);
-			json.element("areaId", game.getBoard().getArea("hand", player)
-					.getId());
+			json.element("areaId", "hand");
 			json.element("owner", true);
 			msg.add(new Object[] { "createCard", json });
 		}
+	}
+
+	private void createMessages(final Player player, List<Object[]> msg) {
+		for (String txt : player.getMessages()) {
+			JSONObject cardJSON = new JSONObject();
+			cardJSON.element("messageItem", txt);
+			msg.add(new Object[] { "message", cardJSON });
+		}
+		addInfoText(player.getGame().getPlayers().getOther(player), msg);
 	}
 
 	@Override
@@ -52,6 +60,7 @@ public class InitAction extends AbstractAction implements Action {
 
 		createTableCards(game, player, msg);
 		createHandCards(game, player, msg);
+		createMessages(player, msg);
 
 		send(player, cc, msg);
 	}

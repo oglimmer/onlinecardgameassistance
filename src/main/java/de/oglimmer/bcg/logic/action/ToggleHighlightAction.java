@@ -7,12 +7,11 @@ import de.oglimmer.bcg.logic.Game;
 import de.oglimmer.bcg.logic.JSONPayload;
 import de.oglimmer.bcg.logic.Player;
 
-public class FlipCardAction extends AbstractAction implements Action {
+public class ToggleHighlightAction extends AbstractAction implements Action {
 
-	private void send(Card card, Player player, ClientChannel cc, String text) {
+	private void send(Card card, Player player, ClientChannel cc) {
 		JSONObject cardJSON = card.toJSON(player, JSONPayload.BASE);
-		player.processMessage(cardJSON, text);
-		send(player, cc, "updateImage", cardJSON);
+		send(player, cc, "toggleHighlight", cardJSON);
 	}
 
 	@Override
@@ -22,15 +21,13 @@ public class FlipCardAction extends AbstractAction implements Action {
 		String cardId = parameters.getString("cardId");
 		Card card = player.getCard(cardId);
 
-		boolean newStatus = !card.isFaceup();
+		boolean newStatus = !card.isHighlight();
 
-		card.setFaceup(newStatus);
+		card.setHighlight(newStatus);
 
-		send(card, player, cc, "You turned a card face "
-				+ (newStatus ? "up" : "down"));
+		send(card, player, cc);
 
 		Player otherPlayer = game.getPlayers().getOther(player);
-		send(card, otherPlayer, cc, "Opponent turned a card face "
-				+ (newStatus ? "up" : "down"));
+		send(card, otherPlayer, cc);
 	}
 }

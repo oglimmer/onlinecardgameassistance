@@ -19,11 +19,14 @@ public class ReturnToDeckAction extends AbstractAction implements Action {
 		List<Object[]> msg = new ArrayList<>();
 
 		JSONObject cardJSON = card.toJSON(player, JSONPayload.ID);
-		cardJSON.element("infoText", text);
+		player.processMessage(cardJSON, text);
 		msg.add(new Object[] { "remove", cardJSON });
 
 		if (owner) {
 			checkDeckPlus(player, discardDeck, msg);
+		} else {
+			addInfoText(player.getGame().getPlayers().getOther(player),
+					cardJSON);
 		}
 
 		send(player, cc, msg);
@@ -57,8 +60,11 @@ public class ReturnToDeckAction extends AbstractAction implements Action {
 		Player otherPlayer = game.getPlayers().getOther(player);
 		String txt = "Opponent returned a card to the " + location + " of the "
 				+ originDeck.getName();
-		if (oldCardList.getName().equals("hand")) {
-			sendMessage(game, otherPlayer, cc, txt);
+		if ("hand".equals(oldCardList.getName())) {
+			List<Object[]> msg = new ArrayList<>();
+			addMessage(game, otherPlayer, cc, msg, txt);
+			addInfoText(player, msg);
+			send(otherPlayer, cc, msg);
 		} else {
 			send(otherPlayer, cc, card, originDeck, txt, false);
 		}

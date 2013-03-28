@@ -8,6 +8,12 @@ define([ "dojo/_base/declare", "dojo/_base/lang", "dojo/window" ], function(decl
 		constructor : function() {
 		},
 		
+		sendToggleHighlight: function(v) {
+			this.sendMsg("toggleHighlight", {
+				cardId : v.id
+			});
+		},
+		
 		sendShuffle: function(v) {
 			this.sendMsg("shuffle", {
 				deckId : v.id

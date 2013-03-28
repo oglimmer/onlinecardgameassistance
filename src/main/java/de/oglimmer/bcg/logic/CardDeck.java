@@ -10,6 +10,10 @@ public class CardDeck extends CardList implements JSONTransformable {
 
 	// private static final Logger log = LoggerFactory.getLogger(Cards.class);
 
+	public static final String DECKNAME_DISCARD = "discard pile";
+	public static final String DECKNAME_COMMAND = "command deck";
+	public static final String DECKNAME_OBJECTIVE = "objective deck";
+
 	private int x;
 	private int y;
 	private Player owner;
@@ -51,13 +55,13 @@ public class CardDeck extends CardList implements JSONTransformable {
 		if (owner == player && !getCards().isEmpty()) {
 			Collection<String> menu = new ArrayList<>();
 			switch (getName()) {
-			case "discard pile":
+			case DECKNAME_DISCARD:
 				menu.add("~Discard Pile");
 				menu.add("-");
 				menu.add("Play card face up on table:takeCardPlayOnTable:up");
 				menu.add("Take top card into hand:takeCardIntoHand:deck");
 				break;
-			case "command deck":
+			case DECKNAME_COMMAND:
 				menu.add("~Command Deck");
 				menu.add("-");
 				menu.add("Take top card into hand:takeCardIntoHand:deck");
@@ -67,7 +71,7 @@ public class CardDeck extends CardList implements JSONTransformable {
 				menu.add("-");
 				menu.add("Shuffle:shuffle");
 				break;
-			case "objective deck":
+			case DECKNAME_OBJECTIVE:
 				menu.add("~Objective Deck");
 				menu.add("-");
 				menu.add("Take top card into hand:takeCardIntoHand:deck");

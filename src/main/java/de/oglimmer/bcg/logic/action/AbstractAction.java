@@ -33,16 +33,35 @@ public abstract class AbstractAction implements Action {
 		}
 	}
 
+	protected void addInfoText(final Player otherPlayer, List<Object[]> msg) {
+		JSONObject cardJSON = new JSONObject();
+		addInfoText(otherPlayer, cardJSON);
+		msg.add(new Object[] { "info", cardJSON });
+	}
+
+	protected void addInfoText(Player otherPlayer, JSONObject cardJSON) {
+		addInfoText(otherPlayer.getCardStacks().get("hand").getCards().size(),
+				cardJSON);
+	}
+
+	protected void addInfoText(int playerHandCards, JSONObject cardJSON) {
+		cardJSON.element("infoText", "Opponent's hand: " + playerHandCards);
+	}
+
 	protected void sendMessage(Game game, Player player, ClientChannel cc,
 			String text) {
 
 		List<Object[]> msg = new ArrayList<>();
+		addMessage(game, player, cc, msg, text);
+		send(player, cc, msg);
+	}
+
+	protected void addMessage(Game game, Player player, ClientChannel cc,
+			List<Object[]> msg, String text) {
 
 		JSONObject cardJSON = new JSONObject();
-		cardJSON.element("infoText", text);
+		player.processMessage(cardJSON, text);
 		msg.add(new Object[] { "message", cardJSON });
-
-		send(player, cc, msg);
 	}
 
 	protected void send(Player player, ClientChannel cc, String handlerName,

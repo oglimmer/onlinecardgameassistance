@@ -14,7 +14,7 @@ public class ModCounterAction extends AbstractAction {
 	private void sendPlayer(Player player, ClientChannel cc, Card card,
 			boolean add, int pos) {
 		JSONObject cardJSON = card.toJSON(player, JSONPayload.COUNTER);
-		cardJSON.element("infoText", (add ? "Increased" : "Decreased")
+		player.processMessage(cardJSON, (add ? "Increased" : "Decreased")
 				+ " counter for " + DESC[pos]);
 		send(player, cc, "modCounter", cardJSON);
 	}

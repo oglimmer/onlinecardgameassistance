@@ -128,7 +128,7 @@ public class Server extends WebSocketServer implements ClientChannel {
 					JSONArray msg = new JSONArray();
 					JSONObject m = new JSONObject();
 					JSONObject mO = new JSONObject();
-					m.element("infoText", "Other player left");
+					otherPlayer.processMessage(m, "Other player left");
 					mO.element("message", m);
 					msg.add(mO);
 					send(otherPlayer, msg);
@@ -142,11 +142,11 @@ public class Server extends WebSocketServer implements ClientChannel {
 			JSONArray jsonArr = new JSONArray();
 			JSONObject outerMsg = new JSONObject();
 			JSONObject msg = new JSONObject();
-			outerMsg.element("infoText", "Other player joined");
-			msg.element("message", outerMsg);
-			jsonArr.add(msg);
 			Player otherPlayer = am.getGame().getPlayers()
 					.getOther(am.getPlayer());
+			otherPlayer.processMessage(outerMsg, "Other player joined");
+			msg.element("message", outerMsg);
+			jsonArr.add(msg);
 			if (otherPlayer.isConnected()) {
 				send(otherPlayer, jsonArr);
 			}

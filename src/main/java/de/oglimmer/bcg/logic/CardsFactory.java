@@ -93,8 +93,8 @@ public class CardsFactory {
 
 	private void createDiscardDeck() {
 		int discardDeckPos = 100 + 100 * playerNo;
-		CardList discardDeck = new CardDeck("discard pile", owner, 10,
-				discardDeckPos, true);
+		CardList discardDeck = new CardDeck(CardDeck.DECKNAME_DISCARD, owner,
+				10, discardDeckPos, true);
 		cards.put("discard", discardDeck);
 	}
 
@@ -122,8 +122,8 @@ public class CardsFactory {
 
 	private void createCommandDeck() throws ParserConfigurationException,
 			SAXException, IOException {
-		CardList commandDeck = new CardDeck("command deck", owner, 10, 100,
-				false);
+		CardList commandDeck = new CardDeck(CardDeck.DECKNAME_COMMAND, owner,
+				10, 100, false);
 		addCards(commandDeck, getImageUrls("Command Deck"), Card.class);
 		Collections.shuffle(commandDeck.getCards());
 		cards.put("command", commandDeck);
@@ -131,8 +131,8 @@ public class CardsFactory {
 
 	private void createObjectiveDeck() throws ParserConfigurationException,
 			SAXException, IOException {
-		CardList objectiveDeck = new CardDeck("objective deck", owner, 10, 10,
-				false);
+		CardList objectiveDeck = new CardDeck(CardDeck.DECKNAME_OBJECTIVE,
+				owner, 10, 10, false);
 		addCards(objectiveDeck, getImageUrls("Objective Deck"), Card.class);
 		Collections.shuffle(objectiveDeck.getCards());
 		cards.put("objective", objectiveDeck);

@@ -6,6 +6,7 @@ import java.util.List;
 import net.sf.json.JSONObject;
 import de.oglimmer.bcg.com.ClientChannel;
 import de.oglimmer.bcg.logic.Card;
+import de.oglimmer.bcg.logic.CardDeck;
 import de.oglimmer.bcg.logic.CardList;
 import de.oglimmer.bcg.logic.Game;
 import de.oglimmer.bcg.logic.GameException;
@@ -14,23 +15,52 @@ import de.oglimmer.bcg.logic.Player;
 
 public class TakeCardIntoHandAction extends AbstractAction implements Action {
 
-	private void sendPlayer(Player player, ClientChannel cc, CardList cards,
-			Card card, Game game) {
+	private void sendDeckPlayer(Player player, ClientChannel cc,
+			CardList cards, Card card, Game game) {
 
 		List<Object[]> msg = new ArrayList<>();
 
 		JSONObject cardJSON = card.toJSON(player, JSONPayload.BASE);
 		// specify target area
-		cardJSON.element("areaId", game.getBoard().getArea("hand", player)
-				.getId());
+		cardJSON.element("areaId", "hand");
 		cardJSON.element("owner", true);
-		cardJSON.element("infoText", "You took a card from " + cards.getName()
-				+ " into the hand");
+		player.processMessage(cardJSON,
+				"You took a card from " + cards.getName() + " into the hand");
 		msg.add(new Object[] { "createCard", cardJSON });
 
 		checkDeckMinus(player, cards, msg);
 
 		send(player, cc, msg);
+	}
+
+	private void sendDeckOther(Game game, ClientChannel cc, CardList cards,
+			Player player, Player otherPlayer) {
+		List<Object[]> msg = new ArrayList<>();
+		if (CardDeck.DECKNAME_DISCARD.equals(cards.getName())) {
+			checkDeckMinus(otherPlayer, cards, msg);
+		}
+		addMessage(game, otherPlayer, cc, msg, "Opponent took a card from "
+				+ cards.getName() + " into the hand");
+
+		addInfoText(player, msg);
+
+		send(otherPlayer, cc, msg);
+	}
+
+	private void sendCardPlayer(Player player, ClientChannel cc, Card card) {
+		JSONObject cardJSON = card.toJSON(player, JSONPayload.BASE);
+		cardJSON.element("areaId", "hand");
+		player.processMessage(cardJSON, "You took a card back into hand");
+		send(player, cc, "playCard", cardJSON);
+	}
+
+	private void sendCardOther(Player player, ClientChannel cc, Card card,
+			Player otherPlayer) {
+		JSONObject cardJSON = card.toJSON(player, JSONPayload.ID);
+		otherPlayer.processMessage(cardJSON,
+				"Opponent took card back into hand");
+		addInfoText(player, cardJSON);
+		send(otherPlayer, cc, "remove", cardJSON);
 	}
 
 	@Override
@@ -59,22 +89,13 @@ public class TakeCardIntoHandAction extends AbstractAction implements Action {
 		card.setX(200);
 		card.setY(20);
 
+		Player otherPlayer = game.getPlayers().getOther(player);
 		if ("deck".equals(sourceType)) {
-			sendPlayer(player, cc, cards, card, game);
-			sendMessage(game, game.getPlayers().getOther(player), cc,
-					"Opponent took a card from " + cards.getName()
-							+ " into the hand");
+			sendDeckPlayer(player, cc, cards, card, game);
+			sendDeckOther(game, cc, cards, player, otherPlayer);
 		} else if ("card".equals(sourceType)) {
-			JSONObject cardJSON = card.toJSON(player, JSONPayload.BASE);
-			cardJSON.element("areaId", game.getBoard().getArea("hand", player)
-					.getId());
-			cardJSON.put("infoText", "You took a card back into hand");
-			send(player, cc, "playCard", cardJSON);
-
-			cardJSON = card.toJSON(player, JSONPayload.ID);
-			cardJSON.element("infoText", "Opponent took card back into hand");
-			send(game.getPlayers().getOther(player), cc, "remove", cardJSON);
-
+			sendCardPlayer(player, cc, card);
+			sendCardOther(player, cc, card, otherPlayer);
 		}
 	}
 

@@ -20,6 +20,7 @@ public class Card implements JSONTransformable {
 	private int y;
 	private int[] counter = new int[3];
 	private CardList origin;
+	private boolean highlight;
 
 	public Card(Player owner, CardList origin, String imageUrl,
 			String backImageUrl) {
@@ -84,6 +85,14 @@ public class Card implements JSONTransformable {
 		return backImageUrl;
 	}
 
+	public boolean isHighlight() {
+		return highlight;
+	}
+
+	public void setHighlight(boolean highlight) {
+		this.highlight = highlight;
+	}
+
 	@Override
 	public JSONObject toJSON(Player player, JSONPayload... payload) {
 		if (payload.length == 0) {
@@ -108,7 +117,7 @@ public class Card implements JSONTransformable {
 		} else {
 			card.element("imageUrl", backImageUrl);
 		}
-
+		card.element("hl", highlight);
 		Collection<String> menu = new ArrayList<>();
 		addMenu(player, card, menu);
 		if (!menu.isEmpty()) {
@@ -124,24 +133,40 @@ public class Card implements JSONTransformable {
 
 	protected void addMenu(Player player, JSONObject card,
 			Collection<String> menu) {
+		String areaOfCard = player.getGame().getBoard().getCardList(this);
+		if ("table".equals(areaOfCard)) {
+			menu.add("Toggle highlight:toggleHighlight");
+		}
 		if (owner == null || owner == player) {
 			if (!faceup) {
+				if (!menu.isEmpty()) {
+					menu.add("-");
+				}
 				menu.add("Face up:flipCard");
-				menu.add("-");
 			}
-			switch (player.getGame().getBoard().getArea(this)) {
+			switch (areaOfCard) {
 			case "hand":
+				if (!menu.isEmpty()) {
+					menu.add("-");
+				}
 				menu.add("Play card face up on table:playCardOnTable:up");
 				menu.add("Play card face down on table:playCardOnTable:down");
 				menu.add("-");
-				menu.add("Put card on top of command deck:returnToDeck:top");
-				menu.add("Put card under command deck:returnToDeck:bottom");
+				menu.add("Put card on top of " + origin.getName()
+						+ ":returnToDeck:top");
+				menu.add("Put card under " + origin.getName()
+						+ ":returnToDeck:bottom");
 				break;
 			case "table":
+				if (!menu.isEmpty()) {
+					menu.add("-");
+				}
 				menu.add("Rotate card:rotateCard");
 				menu.add("-");
-				menu.add("Put card on top of command deck:returnToDeck:top");
-				menu.add("Put card under command deck:returnToDeck:bottom");
+				menu.add("Put card on top of " + origin.getName()
+						+ ":returnToDeck:top");
+				menu.add("Put card under " + origin.getName()
+						+ ":returnToDeck:bottom");
 				menu.add("-");
 				menu.add("Take top card into hand:takeCardIntoHand:card");
 				menu.add("-");
@@ -153,7 +178,9 @@ public class Card implements JSONTransformable {
 				menu.add("-1 Shield:modCounter:sub-2");
 				break;
 			}
-			menu.add("-");
+			if (!menu.isEmpty()) {
+				menu.add("-");
+			}
 			menu.add("Discard card:discardCard");
 		}
 	}

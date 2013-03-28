@@ -1,7 +1,10 @@
 package de.oglimmer.bcg.logic;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
 
+import net.sf.json.JSONObject;
 import de.oglimmer.bcg.util.JSONTransformable;
 import de.oglimmer.bcg.util.RandomString;
 
@@ -18,6 +21,7 @@ public class Player implements JSONTransformable {
 	private boolean connected;
 	private int browserWidth;
 	private int browserHeight;
+	private Collection<String> message = new ArrayList<>();
 
 	public Player(int no, String key, Game game, Side side,
 			InputStream deckStream) {
@@ -131,6 +135,15 @@ public class Player implements JSONTransformable {
 	@Override
 	public String toJSON(Player player, JSONPayload... payload) {
 		return Integer.toString(no);
+	}
+
+	public void processMessage(JSONObject cardJSON, String text) {
+		cardJSON.element("messageItem", text);
+		message.add(text);
+	}
+
+	public Collection<String> getMessages() {
+		return message;
 	}
 
 }

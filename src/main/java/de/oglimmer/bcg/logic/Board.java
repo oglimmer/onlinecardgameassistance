@@ -25,31 +25,7 @@ public class Board {
 		return areas;
 	}
 
-	public BoardArea getArea(String name) {
-		if (name.equals("hand")) {
-			throw new GameException(
-					"Use BoardArea getArea(String name, Player player) for name==hand");
-		}
-		for (BoardArea ba : areas) {
-			if (ba.getName().equals(name)) {
-				return ba;
-			}
-		}
-		throw new GameException("No area with name " + name);
-	}
-
-	public BoardArea getArea(String name, Player player) {
-		for (BoardArea ba : areas) {
-			if (ba.getName().equals(name)
-					&& ba.getVisibleFor().contains(player)) {
-				return ba;
-			}
-		}
-		throw new GameException("No area with name " + name
-				+ " visible for player " + player);
-	}
-
-	public String getArea(Card card) {
+	public String getCardList(Card card) {
 		for (Player p : game.getPlayers().getPlayers()) {
 			for (CardList cl : p.getCardStacks().getCardStacks().values()) {
 				if (cl.getCards().contains(card)) {
@@ -57,7 +33,7 @@ public class Board {
 				}
 			}
 		}
-		throw new GameException("No card in game.");
+		throw new GameException("No card in game with id = " + card.getId());
 	}
 
 	private void init() {
@@ -69,6 +45,7 @@ public class Board {
 		createPlayerHandArea(player0);
 		createPlayerHandArea(player1);
 		createInfoArea(player0, player1);
+		createMessageArea(player0, player1);
 	}
 
 	private void createTableArea(Player player0, Player player1) {
@@ -88,14 +65,26 @@ public class Board {
 		areas.add(mainBa);
 	}
 
+	private void createMessageArea(Player player0, Player player1) {
+		List<Player> allPlayers;
+		BoardArea messageBA = new BoardArea("messages");
+		allPlayers = messageBA.getVisibleFor();
+		allPlayers.add(player1);
+		allPlayers.add(player0);
+		messageBA
+				.setCss("{\"backgroundColor\":\"black\",\"color\":\"white\", \"height\":\"20%\","
+						+ "\"width\":\"30%\",\"overflow\":\"auto\",\"float\":\"left\"}");
+		areas.add(messageBA);
+	}
+
 	private void createInfoArea(Player player0, Player player1) {
 		List<Player> allPlayers;
 		BoardArea infoBa = new BoardArea("info");
 		allPlayers = infoBa.getVisibleFor();
 		allPlayers.add(player1);
 		allPlayers.add(player0);
-		infoBa.setCss("{\"backgroundColor\":\"black\",\"color\":\"white\", \"height\":\"24%\","
-				+ "\"width\":\"30%\",\"overflow\":\"auto\",\"float\":\"left\"}");
+		infoBa.setCss("{\"backgroundColor\":\"black\",\"color\":\"white\", \"height\":\"4%\","
+				+ "\"width\":\"30%\",\"overflow\":\"auto\",\"float\":\"left\", \"font-family\": \"Arial\", \"font-size\": \"10px\"}");
 		areas.add(infoBa);
 	}
 

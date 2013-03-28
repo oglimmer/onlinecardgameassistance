@@ -14,18 +14,21 @@ import de.oglimmer.bcg.logic.Player;
 
 public class DiscardAction extends AbstractAction implements Action {
 
-	private void send(Player player, ClientChannel cc, Card card,
-			CardDeck discardDeck, String text) {
+	private void send(Player playerToSend, Player otherPlayer,
+			ClientChannel cc, Card card, CardDeck discardDeck, String text) {
 		List<Object[]> msg = new ArrayList<>();
-		JSONObject cardJSON = card.toJSON(player, JSONPayload.BASE);
+		JSONObject cardJSON = card.toJSON(playerToSend, JSONPayload.BASE);
 		// cardList from where the card will be removed
 		cardJSON.element("discardId", discardDeck.getId());
-		cardJSON.element("infoText", text);
+		playerToSend.processMessage(cardJSON, text);
+		if (otherPlayer != null) {
+			addInfoText(otherPlayer, cardJSON);
+		}
 		msg.add(new Object[] { "discard", cardJSON });
 
-		checkDeckPlus(player, discardDeck, msg);
+		checkDeckPlus(playerToSend, discardDeck, msg);
 
-		send(player, cc, msg);
+		send(playerToSend, cc, msg);
 	}
 
 	@Override
@@ -45,8 +48,9 @@ public class DiscardAction extends AbstractAction implements Action {
 		card.setX(200);
 		card.setY(20);
 
-		send(player, cc, card, discardDeck, "Your discarded a card");
-		send(game.getPlayers().getOther(player), cc, card, discardDeck,
+		Player otherPlayer = game.getPlayers().getOther(player);
+		send(player, null, cc, card, discardDeck, "You discarded a card");
+		send(otherPlayer, player, cc, card, discardDeck,
 				"Opponent discarded a card");
 
 	}

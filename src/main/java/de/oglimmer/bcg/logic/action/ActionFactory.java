@@ -28,6 +28,7 @@ public enum ActionFactory {
 		def.add(new ModCounterAction());
 		def.add(new ReturnToDeckAction());
 		def.add(new ShuffleAction());
+		def.add(new ToggleHighlightAction());
 	}
 
 	public Action getAction(String actionId) {
