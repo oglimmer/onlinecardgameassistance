@@ -4,8 +4,17 @@ html,body {
 	margin: 0
 }
 
-#table {
-	height: 100%
+html, body, div, image {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+#tableArea {
+	height: 100%;
 }
 
 .area {

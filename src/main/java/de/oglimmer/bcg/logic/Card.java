@@ -9,6 +9,8 @@ import de.oglimmer.bcg.util.RandomString;
 
 public class Card implements JSONTransformable {
 
+	public static final int DEFAULT_ZINDEX = 50_000;
+
 	// private static final Logger log = LoggerFactory.getLogger(Card.class);
 
 	private String id;
@@ -21,6 +23,7 @@ public class Card implements JSONTransformable {
 	private int[] counter = new int[3];
 	private CardList origin;
 	private boolean highlight;
+	private int zIndex = DEFAULT_ZINDEX;
 
 	public Card(Player owner, CardList origin, String imageUrl,
 			String backImageUrl) {
@@ -93,6 +96,10 @@ public class Card implements JSONTransformable {
 		this.highlight = highlight;
 	}
 
+	public void setZIndex(int zIndex) {
+		this.zIndex = zIndex;
+	}
+
 	@Override
 	public JSONObject toJSON(Player player, JSONPayload... payload) {
 		if (payload.length == 0) {
@@ -118,6 +125,7 @@ public class Card implements JSONTransformable {
 			card.element("imageUrl", backImageUrl);
 		}
 		card.element("hl", highlight);
+		card.element("zIndex", zIndex);
 		Collection<String> menu = new ArrayList<>();
 		addMenu(player, card, menu);
 		if (!menu.isEmpty()) {
@@ -182,6 +190,13 @@ public class Card implements JSONTransformable {
 				menu.add("-");
 			}
 			menu.add("Discard card:discardCard");
+		}
+		if ("table".equals(areaOfCard)) {
+			if (!menu.isEmpty()) {
+				menu.add("-");
+			}
+			menu.add("Bring to foreground:changeZIndex:up");
+			menu.add("Bring to background:changeZIndex:down");
 		}
 	}
 

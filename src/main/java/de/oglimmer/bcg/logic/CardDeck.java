@@ -18,6 +18,8 @@ public class CardDeck extends CardList implements JSONTransformable {
 	private int y;
 	private Player owner;
 	private boolean openCardList;
+	private int[] zIndexBorders = new int[] { Card.DEFAULT_ZINDEX,
+			Card.DEFAULT_ZINDEX };
 
 	public CardDeck(String name, Player owner, int x, int y,
 			boolean openCardList) {
@@ -89,4 +91,9 @@ public class CardDeck extends CardList implements JSONTransformable {
 	public boolean isOpenCardList() {
 		return openCardList;
 	}
+
+	public int[] getZIndexBorders() {
+		return zIndexBorders;
+	}
+
 }

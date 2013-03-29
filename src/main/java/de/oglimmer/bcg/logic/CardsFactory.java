@@ -27,6 +27,11 @@ public class CardsFactory {
 	private static final String DEFAULT_BACKGROUND_LIGHT = "Star Wars LCG Light - 0001.jpg";
 	private static final String DEFAULT_BACKGROUND_DARK = "Star Wars LCG Dark - 0001.jpg";
 	public static final String EMPTY_CARDS_IMG = "Star Wars LCG - 0000.jpg";
+	private static final String[] REF_FILES = { "/Core.xml",
+			"/Desolation-Of-Hoth.xml" };
+
+	private static Map<String, String> idImageCache = new HashMap<>();
+
 	private static final Logger log = LoggerFactory
 			.getLogger(CardsFactory.class);
 
@@ -181,29 +186,34 @@ public class CardsFactory {
 	 * @throws IOException
 	 * @throws ParserConfigurationException
 	 */
-	private Map<String, String> getIdFilenameMapping() throws SAXException,
-			IOException, ParserConfigurationException {
-		Map<String, String> ret = new HashMap<>();
+	private synchronized Map<String, String> getIdFilenameMapping()
+			throws SAXException, IOException, ParserConfigurationException {
 
-		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-		Document doc = dBuilder.parse(this.getClass().getResourceAsStream(
-				"/Core.xml"));
-		doc.getDocumentElement().normalize();
+		if (idImageCache.isEmpty()) {
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory
+					.newInstance();
+			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 
-		NodeList nl = doc.getElementsByTagName("Relationship");
-		for (int i = 0; i < nl.getLength(); i++) {
-			Node n = nl.item(i);
-			String longFileName = n.getAttributes().getNamedItem("Target")
-					.getNodeValue();
-			if (longFileName.startsWith("/cards/")) {
-				longFileName = longFileName.substring(7);
+			for (String refFile : REF_FILES) {
+				Document doc = dBuilder.parse(this.getClass()
+						.getResourceAsStream(refFile));
+				doc.getDocumentElement().normalize();
+
+				NodeList nl = doc.getElementsByTagName("Relationship");
+				for (int i = 0; i < nl.getLength(); i++) {
+					Node n = nl.item(i);
+					String longFileName = n.getAttributes()
+							.getNamedItem("Target").getNodeValue();
+					if (longFileName.startsWith("/cards/")) {
+						longFileName = longFileName.substring(7);
+					}
+					idImageCache.put(n.getAttributes().getNamedItem("Id")
+							.getNodeValue(), longFileName);
+				}
 			}
-			ret.put(n.getAttributes().getNamedItem("Id").getNodeValue(),
-					longFileName);
 		}
 
-		return ret;
+		return idImageCache;
 	}
 
 	/**

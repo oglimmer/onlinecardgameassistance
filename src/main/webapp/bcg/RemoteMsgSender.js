@@ -8,6 +8,13 @@ define([ "dojo/_base/declare", "dojo/_base/lang", "dojo/window" ], function(decl
 		constructor : function() {
 		},
 		
+		sendChangeZIndex: function(v) {
+			this.sendMsg("changeZIndex", {
+				cardId : v.id,
+				mode : v.param
+			});
+		},
+		
 		sendToggleHighlight: function(v) {
 			this.sendMsg("toggleHighlight", {
 				cardId : v.id

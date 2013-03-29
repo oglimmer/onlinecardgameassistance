@@ -37,14 +37,21 @@ return declare(null, {
 			borderNode.style.height = "0px";			
 		}
 		
-		// if the table is already populated, ignore an init msg		
-		if(dom.byId("table").innerHTML == "") {
+		// if the "tableArea" is already populated, ignore an init msg		
+		if(dom.byId("tableArea").innerHTML == "") {
 			this.remoteMsgSender.sendInitMsg();
 			var self = this;
 			on(window, "resize", Cowboy.debounce( 1000, function(e) {
 				self.remoteMsgSender.sendPreInitMsg();
 			}));
 		}
+	},
+	
+	changeZIndexHandler: function(v) {
+		var node = dom.byId(v.id);
+		node.style.zIndex = v.zIndex;
+		this.messageHandler(v);
+		this.infoHandler(v);
 	},
 	
 	toggleHighlightHandler: function(v) {
@@ -191,14 +198,14 @@ return declare(null, {
 	createDivsHandler: function(v) {
 		var self = this;
 		dom.byId("overlay").style.display = "none";
-		dom.byId("table").innerHTML ="";
+		dom.byId("tableArea").innerHTML ="";
 		arrayUtil.forEach(v, function(item, index) {
 						
 			var newDiv = domConstruct.create("div", {
 				"class" : "area",
 				"id" : item.id,
 				"style" : item.css
-			}, dom.byId("table"));
+			}, dom.byId("tableArea"));
 			
 			if(item.id=='messages') {
 				self.idFromMessages = item.id;
@@ -221,7 +228,7 @@ return declare(null, {
 				domConstruct.destroy(toDestroy);
 			}
 		}		
-		on(c, "mouseover", function(e) {
+		on(c, "mouseover", function(e) {			
 			var imgNode = dom.byId("IMG"+v.id);
 			if(imgNode!=null) {
 				removeZoomCard();
@@ -229,12 +236,12 @@ return declare(null, {
 					src : imgNode.src.replace(/cards/g, "cardsLarge"),
 					id : "ZOOMCARD",
 					style : {
-						zIndex: 1,
+						zIndex: 2,
 						position : "absolute",
 						top : "5px",
 						right : "5px"
 					}
-				}, "table");
+				}, "tableArea");
 			}
 		});
 		on(c, "mouseout", function(e) {
@@ -246,7 +253,7 @@ return declare(null, {
 		var card = domConstruct.create("div", {			
 			id : v.id,
 			style : {
-				zIndex: 2,
+				zIndex: v.zIndex,
 				position : "absolute",
 				top : v.y+"px",
 				left : v.x+"px",

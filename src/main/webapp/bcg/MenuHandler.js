@@ -1,5 +1,5 @@
-define([ "dojo/_base/declare", "dojo/_base/array", "dijit/Menu", "dijit/MenuItem", "dijit/MenuSeparator", "dojo/_base/lang" ], 
-		function(declare, arrayUtil, Menu, MenuItem, MenuSeparator, lang) {
+define([ "dojo/_base/declare", "dojo/_base/array", "dijit/Menu", "dijit/MenuItem", "dijit/MenuSeparator", "dojo/_base/lang", "dojo/query", "dojo/NodeList-dom" ], 
+		function(declare, arrayUtil, Menu, MenuItem, MenuSeparator, lang, query) {
 
 return declare(null, {
 
@@ -12,7 +12,7 @@ return declare(null, {
 	
 	createMenu: function(node, entries) {
 		var pMenu = new Menu({
-	        targetNodeIds: [node]
+	        targetNodeIds: [node]	        
 	    });
 		this.menuToNodeMapping[node] = pMenu;
 		arrayUtil.forEach(entries, function(item, index) {
@@ -33,7 +33,15 @@ return declare(null, {
 			    }));
 			}
 		});
-	    pMenu.startup();				
+		
+		/* HACK!!! dijit menus have a z-index of 1000. specifiy the z-index in the constructor mix doesn't work */
+		pMenu.onOpen = function(v) {
+		    query('.dijitPopup').forEach(function(node) {
+		    	node.style.zIndex = 999999999;
+		    });
+		};
+		
+	    pMenu.startup();
 	},
 	
 	isDefined: function(id) {
