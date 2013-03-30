@@ -15,8 +15,8 @@ public class AffiliationCard extends Card {
 	protected void addMenu(Player player, JSONObject card,
 			Collection<String> menu) {
 		if (isOwner(player)) {
-			menu.add("+1 Resource:modCounter:add-0");
-			menu.add("-1 Resource:modCounter:sub-0");
+			menu.add("+1 Focus:modCounter:add-0");
+			menu.add("-1 Focus:modCounter:sub-0");
 		}
 	}
 }

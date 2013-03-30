@@ -34,11 +34,17 @@ return declare(null, {
 			}
 		});
 		
-		/* HACK!!! dijit menus have a z-index of 1000. specifiy the z-index in the constructor mix doesn't work */
 		pMenu.onOpen = function(v) {
+			/* HACK!!! dijit menus have a z-index of 1000. specifiy the z-index in the constructor mix doesn't work */
 		    query('.dijitPopup').forEach(function(node) {
 		    	node.style.zIndex = 999999999;
 		    });
+		    /* HACK!!! sometimes menu items are still selected from the last action. so remove manually */
+			arrayUtil.forEach(this.getChildren(), function(v) {
+				if(typeof(v._setSelected)!=='undefined') {
+					v._setSelected(false);
+				}
+			});
 		};
 		
 	    pMenu.startup();

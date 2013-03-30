@@ -20,18 +20,18 @@ return declare(null, {
 	},
 	
 	initHandler: function(v) {
-		var borderNode = dom.byId("borderX");
-		if(win.getBox().w > v.browserWidth) {
-			borderNode.style.width = (v.browserWidth*1)+"px";
+		var borderNode = dom.byId("horizontalBorder");
+		if(win.getBox().h > v.browserHeight) {		
+			borderNode.style.width = Math.min(v.browserWidth, win.getBox().w)+"px";
 			borderNode.style.top = (v.browserHeight*0.76)+"px";
 		} else {
 			borderNode.style.width = "0px";
 			borderNode.style.top = "0px";			
 		}
-		borderNode = dom.byId("borderY");
-		if(win.getBox().h > v.browserHeight) {
-			borderNode.style.left = (v.browserWidth*1)+"px";
-			borderNode.style.height = (v.browserHeight*0.76)+"px";
+		borderNode = dom.byId("verticalBorder");
+		if(win.getBox().w > v.browserWidth) {
+			borderNode.style.left = v.browserWidth+"px";
+			borderNode.style.height = (Math.min(v.browserHeight, win.getBox().h)*0.76)+"px";
 		} else {
 			borderNode.style.left = "0px";
 			borderNode.style.height = "0px";			

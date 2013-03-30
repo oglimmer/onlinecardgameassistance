@@ -51,18 +51,18 @@ ul {
 	text-align: center;
 }
 
-#borderX {
+#horizontalBorder {
 	border-top: 1px solid black;
 	position: absolute;
 	height:1px;
 	left: 0px;	
-	z-index: 999;
+	z-index: 3;
 }
 
-#borderY {
+#verticalBorder {
 	border-left: 1px solid black;
 	position: absolute;
 	width:1px;
 	top: 0px;
-	z-index: 999;
+	z-index: 3;
 }

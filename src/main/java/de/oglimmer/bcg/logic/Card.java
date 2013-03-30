@@ -176,10 +176,10 @@ public class Card implements JSONTransformable {
 				menu.add("Put card under " + origin.getName()
 						+ ":returnToDeck:bottom");
 				menu.add("-");
-				menu.add("Take top card into hand:takeCardIntoHand:card");
+				menu.add("Take back into hand:takeCardIntoHand:card");
 				menu.add("-");
-				menu.add("+1 Resource:modCounter:add-0");
-				menu.add("-1 Resource:modCounter:sub-0");
+				menu.add("+1 Focus:modCounter:add-0");
+				menu.add("-1 Focus:modCounter:sub-0");
 				menu.add("+1 Damage:modCounter:add-1");
 				menu.add("-1 Damage:modCounter:sub-1");
 				menu.add("+1 Shield:modCounter:add-2");

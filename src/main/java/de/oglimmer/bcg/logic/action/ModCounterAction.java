@@ -9,7 +9,7 @@ import de.oglimmer.bcg.logic.Player;
 
 public class ModCounterAction extends AbstractAction {
 
-	private static final String[] DESC = { "Resource", "Damage", "Shield" };
+	private static final String[] DESC = { "Focus", "Damage", "Shield" };
 
 	private void sendPlayer(Player player, ClientChannel cc, Card card,
 			boolean add, int pos) {
