@@ -6,7 +6,7 @@ import java.util.Collection;
 import net.sf.json.JSONObject;
 import de.oglimmer.bcg.util.JSONTransformable;
 
-public class CardDeck extends CardList implements JSONTransformable {
+public class CardDeck extends CardList implements JSONTransformable, UIElement {
 
 	// private static final Logger log = LoggerFactory.getLogger(Cards.class);
 
@@ -49,6 +49,7 @@ public class CardDeck extends CardList implements JSONTransformable {
 		json.element("y", y);
 		json.element("id", getId());
 		json.element("type", "deck");
+		json.element("moveable", getName().equals(DECKNAME_DISCARD));
 		addMenu(player, json);
 		return json;
 	}
@@ -94,6 +95,16 @@ public class CardDeck extends CardList implements JSONTransformable {
 
 	public int[] getZIndexBorders() {
 		return zIndexBorders;
+	}
+
+	@Override
+	public void setX(int xPos) {
+		this.x = xPos;
+	}
+
+	@Override
+	public void setY(int yPos) {
+		this.y = yPos;		
 	}
 
 }

@@ -16,19 +16,15 @@ return declare(null, {
 	    });
 		this.menuToNodeMapping[node] = pMenu;
 		arrayUtil.forEach(entries, function(item, index) {
-			if(item.label=="-") {
+			if(item.type==0) {
 				pMenu.addChild(new MenuSeparator());
+			} else if(item.type==1) {
+				pMenu.addChild(new MenuItem({label: item.label, disabled: true }));
 			} else {				
-				var disabled = false;
-				if(item.label.charAt(0) == "~"){
-					disabled = true;
-					item.label = item.label.substring(1);
-				}
 			    pMenu.addChild(new MenuItem({
 			        label: item.label,
-			        disabled: disabled,
 			        onClick: function(){
-			        	item.fnct(item.params);
+			        	item.fnct(item.actionName, item.params);
 			        }
 			    }));
 			}
@@ -68,26 +64,29 @@ return declare(null, {
 		var self = this;
 		var menuData = new Array();
 		arrayUtil.forEach(menu, function(item, index) {
+			// item looks like "label:actionName:[param]"
 			var splits = item.split(":");			
 			var name = splits[0];
-			var fnct = null;			
-			if(name.charAt(0)!="~" && name!="-") {
-				var action = "send"+splits[1].substr(0,1).toUpperCase()+splits[1].substr(1);
-				fnct = self.remoteMsgSender[action];
-				if(typeof(fnct)=='undefined' || fnct==null) {
-					console.log(action);
-				}
-				fnct = fnct.bind(self.remoteMsgSender);
+			if(name.charAt(0)=="~") {
+				// headline
+				menuData.push({type: 1, label : name.substring(1)});
+			} else if(name=="-") {
+				// separator
+				menuData.push({type: 0});
+			} else {
+				// menu entry with remote action
 				if(typeof(splits[2]) != 'undefined') {
 					v = lang.clone(v);
 					lang.mixin(v, { "param": splits[2] });
 				}
+				menuData.push({
+					type: 2,
+					label : name,
+					fnct : self.remoteMsgSender.send.bind(self.remoteMsgSender),
+					actionName : splits[1],
+					params: v
+				});
 			}
-			menuData.push({
-				label : name,
-				fnct : fnct,
-				params : v
-			});
 		});
 		if(menuData.length>0) {
 			this.createMenu(v.id, menuData);

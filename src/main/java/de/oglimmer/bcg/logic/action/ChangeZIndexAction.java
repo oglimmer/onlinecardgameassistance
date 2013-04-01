@@ -19,8 +19,8 @@ public class ChangeZIndexAction extends AbstractAction implements Action {
 	public void execute(Game game, Player player, JSONObject parameters,
 			ClientChannel cc) {
 
-		String cardId = parameters.getString("cardId");
-		String mode = parameters.getString("mode");
+		String cardId = parameters.getString("entityId");
+		String mode = parameters.getString("param");
 		Card card = player.getCard(cardId);
 
 		int newZIndex = "down".equals(mode) ? getSmallest(card)

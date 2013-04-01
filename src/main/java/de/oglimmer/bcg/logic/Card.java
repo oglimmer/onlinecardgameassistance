@@ -7,7 +7,7 @@ import net.sf.json.JSONObject;
 import de.oglimmer.bcg.util.JSONTransformable;
 import de.oglimmer.bcg.util.RandomString;
 
-public class Card implements JSONTransformable {
+public class Card implements JSONTransformable, UIElement {
 
 	public static final int DEFAULT_ZINDEX = 50_000;
 
@@ -56,6 +56,7 @@ public class Card implements JSONTransformable {
 		return x;
 	}
 
+	@Override
 	public void setX(int x) {
 		this.x = x;
 	}
@@ -64,6 +65,7 @@ public class Card implements JSONTransformable {
 		return y;
 	}
 
+	@Override
 	public void setY(int y) {
 		this.y = y;
 	}
@@ -189,7 +191,7 @@ public class Card implements JSONTransformable {
 			if (!menu.isEmpty()) {
 				menu.add("-");
 			}
-			menu.add("Discard card:discardCard");
+			menu.add("Discard card:discard");
 		}
 		if ("table".equals(areaOfCard)) {
 			if (!menu.isEmpty()) {

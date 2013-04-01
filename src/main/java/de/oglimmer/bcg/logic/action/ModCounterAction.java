@@ -23,8 +23,8 @@ public class ModCounterAction extends AbstractAction {
 	public void execute(Game game, Player player, JSONObject parameters,
 			ClientChannel cc) {
 
-		String cardId = parameters.getString("cardId");
-		String mode[] = parameters.getString("mode").split("-");
+		String cardId = parameters.getString("entityId");
+		String mode[] = parameters.getString("param").split("-");
 		boolean add = "add".equals(mode[0]);
 		int pos = Integer.parseInt(mode[1]);
 		Card card = player.getCard(cardId);

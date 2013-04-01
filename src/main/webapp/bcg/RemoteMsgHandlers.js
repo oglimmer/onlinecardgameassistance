@@ -18,10 +18,10 @@ return declare(null, {
 		dom.byId("overlay").style.display = "block";
 		dom.byId("overlayText").innerHTML = "Error:<br/><br/>"+v+"<br/><br/><a href='portal.htm'>Back to main screen</a>";
 	},
-	
-	initHandler: function(v) {
+
+	setBorders: function(v) {
 		var borderNode = dom.byId("horizontalBorder");
-		if(win.getBox().h > v.browserHeight) {		
+		if(win.getBox().h > v.browserHeight) {
 			borderNode.style.width = Math.min(v.browserWidth, win.getBox().w)+"px";
 			borderNode.style.top = (v.browserHeight*0.76)+"px";
 		} else {
@@ -35,9 +35,12 @@ return declare(null, {
 		} else {
 			borderNode.style.left = "0px";
 			borderNode.style.height = "0px";			
-		}
-		
-		// if the "tableArea" is already populated, ignore an init msg		
+		}		
+	},
+	
+	initHandler: function(v) {
+		this.setBorders(v);
+		// if the "tableArea" is already populated, don't send init-action again		
 		if(dom.byId("tableArea").innerHTML == "") {
 			this.remoteMsgSender.sendInitMsg();
 			var self = this;
@@ -150,8 +153,10 @@ return declare(null, {
 	
 	/* answer from a mouse move for opponents cards */
 	moveCardHandler: function(v) {
+		console.log(v);
+		console.log(dom.byId(v.id));
 		fx.slideTo({
-		    node: v.cardId,
+		    node: v.id,
 		    top: v.yPos,
 		    left: v.xPos,
 		    units: "px"
@@ -184,11 +189,7 @@ return declare(null, {
 			console.log("Unable to find areaId = "+v.areaId);
 			return;
 		}
-		var card = this.createDivImage(v, areaNode);
-		
-		if(v.owner) {	
-			new Moveable(card, v, this.remoteMsgSender.sendMoveCardMsg.bind(this.remoteMsgSender));
-		}
+		this.createDivImage(v, areaNode);
 		
 		this.messageHandler(v);
 		this.infoHandler(v);
@@ -288,6 +289,10 @@ return declare(null, {
 		this.createCardZoom(card, v);
 		
 		this.menuHandler.addMenu(card, v.menu);
+		
+		if(v.moveable) {	
+			new Moveable(card, v, this.remoteMsgSender.sendMoveCardMsg.bind(this.remoteMsgSender));
+		}
 		
 		return card;
 	},

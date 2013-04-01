@@ -21,7 +21,7 @@ public class TakeCardPlayOnTableAction extends AbstractAction implements Action 
 
 		JSONObject cardJSON = card.toJSON(player, JSONPayload.BASE);
 		cardJSON.element("areaId", "table");
-		cardJSON.element("owner", owner);
+		cardJSON.element("moveable", owner);
 		player.processMessage(cardJSON, text);
 		msg.add(new Object[] { "createCard", cardJSON });
 
@@ -36,8 +36,8 @@ public class TakeCardPlayOnTableAction extends AbstractAction implements Action 
 	public void execute(Game game, Player player, JSONObject parameters,
 			ClientChannel cc) {
 
-		String deckId = parameters.getString("deckId");
-		boolean faceUp = "up".equals(parameters.getString("faceup"));
+		String deckId = parameters.getString("entityId");
+		boolean faceUp = "up".equals(parameters.getString("param"));
 		CardList cards = player.getCardListById(deckId);
 
 		Card card = cards.getCards().remove(0);

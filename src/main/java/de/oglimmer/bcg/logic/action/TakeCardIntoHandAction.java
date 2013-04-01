@@ -23,7 +23,7 @@ public class TakeCardIntoHandAction extends AbstractAction implements Action {
 		JSONObject cardJSON = card.toJSON(player, JSONPayload.BASE);
 		// specify target area
 		cardJSON.element("areaId", "hand");
-		cardJSON.element("owner", true);
+		cardJSON.element("moveable", true);
 		player.processMessage(cardJSON,
 				"You took a card from " + cards.getName() + " into the hand");
 		msg.add(new Object[] { "createCard", cardJSON });
@@ -67,8 +67,8 @@ public class TakeCardIntoHandAction extends AbstractAction implements Action {
 	public void execute(Game game, Player player, JSONObject parameters,
 			ClientChannel cc) {
 
-		String id = parameters.getString("id");
-		String sourceType = parameters.getString("sourceType");
+		String id = parameters.getString("entityId");
+		String sourceType = parameters.getString("param");
 
 		CardList cards;
 		Card card;

@@ -27,7 +27,7 @@ public class PlayCardOnTableAction extends AbstractAction implements Action {
 	private void sendOtherPlayer(Game game, Player otherPlayer,
 			ClientChannel cc, Card card, boolean faceUp, int playerHandCards) {
 		JSONObject cardJSON = send(game, otherPlayer, card);
-		cardJSON.element("owner", false);
+		cardJSON.element("moveable", false);
 		otherPlayer.processMessage(cardJSON, "Opponent played a card face "
 				+ (faceUp ? "up" : "down") + " from hand to table");
 		addInfoText(playerHandCards, cardJSON);
@@ -39,8 +39,8 @@ public class PlayCardOnTableAction extends AbstractAction implements Action {
 	public void execute(Game game, Player player, JSONObject parameters,
 			ClientChannel cc) {
 
-		String cardId = parameters.getString("cardId");
-		boolean faceUp = "up".equals(parameters.getString("faceup"));
+		String cardId = parameters.getString("entityId");
+		boolean faceUp = "up".equals(parameters.getString("param"));
 		Card card = player.getCard(cardId);
 		CardsSet cardStacks = player.getCardStacks();
 		cardStacks.get("hand").getCards().remove(card);

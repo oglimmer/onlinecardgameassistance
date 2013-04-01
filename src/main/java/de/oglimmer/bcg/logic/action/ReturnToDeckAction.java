@@ -36,8 +36,8 @@ public class ReturnToDeckAction extends AbstractAction implements Action {
 	public void execute(Game game, Player player, JSONObject parameters,
 			ClientChannel cc) {
 
-		String cardId = parameters.getString("cardId");
-		String location = parameters.getString("location");
+		String cardId = parameters.getString("entityId");
+		String location = parameters.getString("param");
 		Card card = player.getCard(cardId);
 
 		// remove card from its current cardList

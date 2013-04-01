@@ -21,7 +21,7 @@ public class InitAction extends AbstractAction implements Action {
 			JSONObject json = card.toJSON(player, JSONPayload.BASE,
 					JSONPayload.COUNTER);
 			json.element("areaId", "table");
-			json.element("owner", card.isOwner(player));
+			json.element("moveable", card.isOwner(player));
 			msg.add(new Object[] { "createCard", json });
 		}
 	}
@@ -30,7 +30,7 @@ public class InitAction extends AbstractAction implements Action {
 		for (Card card : player.getCardStacks().get("hand").getCards()) {
 			JSONObject json = card.toJSON(player, JSONPayload.BASE);
 			json.element("areaId", "hand");
-			json.element("owner", true);
+			json.element("moveable", true);
 			msg.add(new Object[] { "createCard", json });
 		}
 	}

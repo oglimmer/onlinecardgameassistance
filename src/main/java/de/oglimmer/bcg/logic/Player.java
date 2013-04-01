@@ -99,6 +99,29 @@ public class Player implements JSONTransformable {
 	}
 
 	/**
+	 * Returns an UIElement with id. This can be an own card, an own cardDeck or
+	 * an open cardDeck (like opponent's discard pile).
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public UIElement getUIElement(String id) {
+		for (CardList cs : getCardStacks().getCardStacks().values()) {
+			if (cs.getId().equals(id)) {
+				return (CardDeck) cs;
+			}
+			for (Card c : cs.getCards()) {
+				if (c.getId().equals(id)) {
+					return c;
+				}
+			}
+		}
+
+		CardList cs = game.getBoard().getCardList(id);
+		return (CardDeck) cs;
+	}
+
+	/**
 	 * Get cardList by id (visible for this player, may be on table though)
 	 * 
 	 * @param cardsId

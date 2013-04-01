@@ -36,6 +36,17 @@ public class Board {
 		throw new GameException("No card in game with id = " + card.getId());
 	}
 
+	public CardList getCardList(String id) {
+		for (Player p : game.getPlayers().getPlayers()) {
+			for (CardList cl : p.getCardStacks().getCardStacks().values()) {
+				if (cl.getId().equals(id)) {
+					return cl;
+				}
+			}
+		}
+		throw new GameException("No cardlist in game with id = " + id);
+	}
+
 	private void init() {
 		Players players = game.getPlayers();
 		Player player0 = players.getPlayer(0);
