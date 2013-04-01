@@ -10,15 +10,16 @@
 <head>
 <title>Browser Card Game</title>
 <meta charset="utf-8" />
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 </head>
 <body>
 
 	<div style="border:3px solid black;padding:5px;font-family:Arial;margin-bottom:5px;">
-		Welcome	<%=session.getAttribute("email")%>
+		Welcome	<%=session.getAttribute("email")%> <button onclick="document.location.href='portal.htm?logoff=true';">Log off</button>
 	</div>
 
 
-	<div style="border:3px solid black;padding:5px;font-family:Arial;margin-bottom:5px;">
+	<div id="mainDiv" style="border:3px solid black;padding:5px;font-family:Arial;margin-bottom:5px;">
 		<% if( (Boolean)session.getAttribute("permissionStartGame") ) { %>
 		To start a new game click <button onclick="document.location.href='start.htm'">here</button><br/><br/><br/>
 		<% } else { %>
@@ -43,5 +44,12 @@
 			<%	} %>
 		<%	} %>
 	</div>
+	<script type="text/javascript">
+	$(function() {
+		if ($.browser.opera || $.browser.msie) {
+			$("#mainDiv").html("Your browser sucks. Please use Chrome, Firefox, Safari.");
+		}
+	});
+	</script>
 </body>
 </html>

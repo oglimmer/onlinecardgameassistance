@@ -15,6 +15,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -31,6 +32,7 @@ import de.oglimmer.bcg.logic.GameException;
 import de.oglimmer.bcg.logic.GameManager;
 import de.oglimmer.bcg.logic.Player;
 import de.oglimmer.bcg.logic.Side;
+import de.oglimmer.bcg.util.RandomString;
 
 @SuppressWarnings("serial")
 public class ControlServlet extends HttpServlet {
@@ -38,9 +40,18 @@ public class ControlServlet extends HttpServlet {
 	private static final Logger log = LoggerFactory
 			.getLogger(ControlServlet.class);
 
+	private String adminPassword;
+
+	public ControlServlet() {
+		adminPassword = RandomString.getRandomStringASCII(8);
+		log.error("adminPassword=" + adminPassword);
+	}
+
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
+
+		restoreSessionFromContext(req);
 
 		String jspPage;
 		if (req.getSession().getAttribute("email") == null) {
@@ -58,6 +69,22 @@ public class ControlServlet extends HttpServlet {
 				return;
 			} else if ("game".equals(path)) {
 				jspPage = "game.html";
+			} else if ("admin".equals(path)
+					&& adminPassword.equals(req.getParameter("pass"))) {
+				jspPage = "admin.jsp";
+			} else if ("adminDel".equals(path)
+					&& adminPassword.equals(req.getParameter("pass"))) {
+				Game game = GameManager.INSTANCE.getGame(req
+						.getParameter("gameId"));
+				GameManager.INSTANCE.remove(game);
+				jspPage = "admin.jsp";
+			} else if ("portal".equals(path)) {
+				if (req.getParameter("logoff") != null) {
+					CrossContextSession.INSTANCE.invalidateAllSessions(req);
+					jspPage = "index.jsp";
+				} else {
+					jspPage = "portal.jsp";
+				}
 			} else {
 				jspPage = "portal.jsp";
 			}
@@ -65,9 +92,31 @@ public class ControlServlet extends HttpServlet {
 		req.getRequestDispatcher("/WEB-INF/html/" + jspPage).forward(req, resp);
 	}
 
+	private void restoreSessionFromContext(HttpServletRequest req)
+			throws IOException {
+		if (CrossContextSession.INSTANCE.retrieveSessionFromServletContext(req)) {
+			HttpSession session = req.getSession();
+			String email = (String) session.getAttribute("email");
+
+			Database db = getDatabase();
+			Document doc = db.getDocument((String) email);
+
+			session.setAttribute("deckList", doc.get("deckList"));
+			session.setAttribute("permissionStartGame",
+					checkForAuthorizedUser(doc));
+		}
+	}
+
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
+
+		restoreSessionFromContext(req);
+		if (req.getSession().getAttribute("email") != null) {
+			req.getRequestDispatcher("/WEB-INF/html/portal.jsp").forward(req,
+					resp);
+			return;
+		}
 
 		String path = getRequestPageName(req);
 		if ("login".equals(path)) {
@@ -79,10 +128,14 @@ public class ControlServlet extends HttpServlet {
 
 			Document doc = db.getDocument(email);
 			if (doc != null && checkPassword(password, doc)) {
-				req.getSession().setAttribute("email", email);
-				req.getSession().setAttribute("deckList", doc.get("deckList"));
-				req.getSession().setAttribute("permissionStartGame",
+				HttpSession session = req.getSession();
+				session.setAttribute("email", email);
+				session.setAttribute("deckList", doc.get("deckList"));
+				session.setAttribute("permissionStartGame",
 						checkForAuthorizedUser(doc));
+
+				CrossContextSession.INSTANCE.saveSessionToServletContext(req);
+
 				req.getRequestDispatcher("/WEB-INF/html/portal.jsp").forward(
 						req, resp);
 			} else {

@@ -10,7 +10,7 @@ public class RotateCardAction extends AbstractAction implements Action {
 	private void send(String cardId, Player player, ClientChannel cc,
 			String text) {
 		JSONObject cardJSON = new JSONObject();
-		cardJSON.element("cardId", cardId);		
+		cardJSON.element("cardId", cardId);
 		player.processMessage(cardJSON, text);
 
 		send(player, cc, "rotateCard", cardJSON);

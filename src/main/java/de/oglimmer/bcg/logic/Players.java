@@ -64,12 +64,17 @@ public class Players {
 	}
 
 	public boolean isNobodyConnected() {
+		return getCurrentlyConnectec() == 0;
+	}
+
+	public int getCurrentlyConnectec() {
+		int ret = 0;
 		for (Player p : players) {
 			if (p.isConnected()) {
-				return false;
+				ret++;
 			}
 		}
-		return true;
+		return ret;
 	}
 
 }

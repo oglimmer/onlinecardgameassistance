@@ -7,17 +7,10 @@ import org.java_websocket.WebSocket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Main {
+public enum Main {
+	INSTANCE;
 
 	private static final Logger log = LoggerFactory.getLogger(Main.class);
-
-	public static void main(String... args) throws InterruptedException {
-		Main m = new Main();
-		m.startUp();
-		synchronized (m) {
-			m.wait();
-		}
-	}
 
 	private Server server;
 

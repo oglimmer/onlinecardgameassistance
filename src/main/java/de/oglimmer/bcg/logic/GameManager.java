@@ -52,6 +52,16 @@ public enum GameManager {
 		return ret;
 	}
 
+	public synchronized Collection<Game> getRunningGames() {
+		Collection<Game> ret = new ArrayList<>();
+		for (Game g : games.values()) {
+			if (g.getPlayers().isPlayersReady()) {
+				ret.add(g);
+			}
+		}
+		return ret;
+	}
+
 	public synchronized Game getGame(Player ply) {
 		for (Game g : games.values()) {
 			if (g.getPlayers().contains(ply)) {

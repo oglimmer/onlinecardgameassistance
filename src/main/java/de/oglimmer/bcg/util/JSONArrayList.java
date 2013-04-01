@@ -2,10 +2,9 @@ package de.oglimmer.bcg.util;
 
 import java.util.ArrayList;
 
+import net.sf.json.JSONArray;
 import de.oglimmer.bcg.logic.JSONPayload;
 import de.oglimmer.bcg.logic.Player;
-
-import net.sf.json.JSONArray;
 
 /**
  * An ArrayList that can be converted to a JSON representation. Therefore all
