@@ -20,6 +20,7 @@ import javax.servlet.http.HttpSession;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -253,21 +254,26 @@ public class ControlServlet extends HttpServlet {
 	}
 
 	private boolean checkPassword(String password, Document doc) {
-		JSONArray passwordJSON = doc.getJSONArray("password");
 		boolean passGood = false;
-		try {
-			MessageDigest messageDigest = MessageDigest.getInstance("SHA1");
-			byte[] data = messageDigest.digest(password.getBytes());
-			if (passwordJSON.size() == data.length) {
-				passGood = true;
-				for (int i = 0; i < passwordJSON.size(); i++) {
-					if (data[i] != (byte) passwordJSON.getInt(i)) {
-						passGood = false;
+		if (doc.has("password2")) {
+			String hashed = doc.getString("password2");
+			passGood = BCrypt.checkpw(password, hashed);
+		} else {
+			JSONArray passwordJSON = doc.getJSONArray("password");
+			try {
+				MessageDigest messageDigest = MessageDigest.getInstance("SHA1");
+				byte[] data = messageDigest.digest(password.getBytes());
+				if (passwordJSON.size() == data.length) {
+					passGood = true;
+					for (int i = 0; i < passwordJSON.size(); i++) {
+						if (data[i] != (byte) passwordJSON.getInt(i)) {
+							passGood = false;
+						}
 					}
 				}
+			} catch (NoSuchAlgorithmException e) {
+				log.error("Failed to checkPassword", e);
 			}
-		} catch (NoSuchAlgorithmException e) {
-			log.error("Failed to checkPassword", e);
 		}
 		return passGood;
 	}
