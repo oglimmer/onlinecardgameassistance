@@ -4,19 +4,25 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.oglimmer.bcg.logic.config.GameConfig;
+
 public class Players {
 
 	private Game game;
 
+	private GameConfig gameConfig;
+
 	private List<Player> players = new ArrayList<>();
 
-	public Players(Game game) {
+	public Players(GameConfig gameConfig, Game game) {
+		this.gameConfig = gameConfig;
 		this.game = game;
 	}
 
 	public synchronized Player createPlayer(String key, Side side,
 			InputStream deckStream) {
-		Player p = new Player(players.size(), key, game, side, deckStream);
+		Player p = new Player(gameConfig, players.size(), key, game, side,
+				deckStream);
 		players.add(p);
 		return p;
 	}

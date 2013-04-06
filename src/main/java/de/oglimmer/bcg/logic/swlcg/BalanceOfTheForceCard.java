@@ -1,13 +1,15 @@
-package de.oglimmer.bcg.logic;
+package de.oglimmer.bcg.logic.swlcg;
 
 import java.util.Collection;
 
 import net.sf.json.JSONObject;
+import de.oglimmer.bcg.logic.Player;
 
-public class BalanceOfTheForceCard extends Card {
+public class BalanceOfTheForceCard extends SwlcgCard {
 
 	public BalanceOfTheForceCard() {
-		super(null, null, "balance_light.jpg", "balance_dark.jpg");
+		super(null, null, "Balance of the Force Card", "balance_light.jpg",
+				"balance_dark.jpg");
 	}
 
 	@Override

@@ -1,5 +1,5 @@
-define([ "dojo/_base/declare", "dojo/_base/array", "dijit/Menu", "dijit/MenuItem", "dijit/MenuSeparator", "dojo/_base/lang", "dojo/query", "dojo/NodeList-dom" ], 
-		function(declare, arrayUtil, Menu, MenuItem, MenuSeparator, lang, query) {
+define([ "dojo/_base/declare", "dojo/_base/array", "dijit/Menu", "dijit/MenuItem", "dijit/MenuSeparator", "dojo/_base/lang", "dojo/query", "dojo/dom", "dojo/NodeList-dom" ], 
+		function(declare, arrayUtil, Menu, MenuItem, MenuSeparator, lang, query, dom) {
 
 return declare(null, {
 
@@ -10,11 +10,13 @@ return declare(null, {
 		this.remoteMsgSender = remoteMsgSender;
 	},
 	
-	createMenu: function(node, entries) {
+	createMenu: function(nodeId, entries) {
 		var pMenu = new Menu({
-	        targetNodeIds: [node]	        
+	        targetNodeIds: [nodeId],	    
+	        leftClickToOpen: true
 	    });
-		this.menuToNodeMapping[node] = pMenu;
+		pMenu.attachedCardId = nodeId;
+		this.menuToNodeMapping[nodeId] = pMenu;
 		arrayUtil.forEach(entries, function(item, index) {
 			if(item.type==0) {
 				pMenu.addChild(new MenuSeparator());
@@ -43,6 +45,14 @@ return declare(null, {
 			});
 		};
 		
+		pMenu._openMyself = function(args) {
+			var cardDiv = dom.byId(this.attachedCardId);
+			if(!this.leftClickToOpen || !cardDiv.moved) {
+				Menu.prototype._openMyself.apply(this, arguments);
+			}
+			cardDiv.moved = false;
+		};
+		
 	    pMenu.startup();
 	},
 	
@@ -57,7 +67,7 @@ return declare(null, {
 		}
 	},
 
-	addMenu: function(v, menu) {
+	addMenu: function(cardDiv, menu) {
 		if(typeof(menu) == "undefined") {
 			return;
 		}
@@ -76,20 +86,20 @@ return declare(null, {
 			} else {
 				// menu entry with remote action
 				if(typeof(splits[2]) != 'undefined') {
-					v = lang.clone(v);
-					lang.mixin(v, { "param": splits[2] });
+					cardDiv = lang.clone(cardDiv);
+					lang.mixin(cardDiv, { "param": splits[2] });
 				}
 				menuData.push({
 					type: 2,
 					label : name,
 					fnct : self.remoteMsgSender.send.bind(self.remoteMsgSender),
 					actionName : splits[1],
-					params: v
+					params: cardDiv
 				});
 			}
 		});
 		if(menuData.length>0) {
-			this.createMenu(v.id, menuData);
+			this.createMenu(cardDiv.id, menuData);
 		}
 	}	
 	

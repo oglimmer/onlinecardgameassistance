@@ -11,14 +11,14 @@ public class BoardArea implements JSONTransformable {
 	// private static final Logger log =
 	// LoggerFactory.getLogger(BoardArea.class);
 
-	private String id;
+	private String name;
 	private JSONArrayList<Player> visibleFor = new JSONArrayList<>();
 	private String css;
 	// internal uses only, contains CardDecks only (no CardLists)
 	private JSONArrayList<CardDeck> cardDeckList = new JSONArrayList<>();
 
-	public BoardArea(String id) {
-		this.id = id;
+	public BoardArea(String name) {
+		this.name = name;
 	}
 
 	public List<Player> getVisibleFor() {
@@ -37,16 +37,16 @@ public class BoardArea implements JSONTransformable {
 		cardDeckList.add(cl);
 	}
 
-	public String getId() {
-		return id;
+	public String getName() {
+		return name;
 	}
 
 	@Override
 	public JSONObject toJSON(Player player, JSONPayload... payload) {
 		JSONObject json = new JSONObject();
 		json.element("css", css);
-		json.element("id", id);
-		// add embedded cardDecks
+		json.element("id", name);
+		// add associated cardDecks
 		json.element("cardDecks", cardDeckList.toJsonArray(player));
 		return json;
 	}

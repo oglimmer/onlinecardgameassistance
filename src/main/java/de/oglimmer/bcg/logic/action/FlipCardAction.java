@@ -26,11 +26,11 @@ public class FlipCardAction extends AbstractAction implements Action {
 
 		card.setFaceup(newStatus);
 
-		send(card, player, cc, "You turned a card face "
+		send(card, player, cc, "You turned " + card.getName() + " face "
 				+ (newStatus ? "up" : "down"));
 
 		Player otherPlayer = game.getPlayers().getOther(player);
-		send(card, otherPlayer, cc, "Opponent turned a card face "
-				+ (newStatus ? "up" : "down"));
+		send(card, otherPlayer, cc, "Opponent turned " + card.getName()
+				+ " face " + (newStatus ? "up" : "down"));
 	}
 }

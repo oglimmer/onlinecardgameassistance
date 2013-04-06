@@ -2,6 +2,7 @@ package de.oglimmer.bcg.logic.action;
 
 import net.sf.json.JSONObject;
 import de.oglimmer.bcg.com.ClientChannel;
+import de.oglimmer.bcg.logic.Card;
 import de.oglimmer.bcg.logic.Game;
 import de.oglimmer.bcg.logic.Player;
 
@@ -21,9 +22,11 @@ public class RotateCardAction extends AbstractAction implements Action {
 			ClientChannel cc) {
 
 		String cardId = parameters.getString("entityId");
-		send(cardId, player, cc, "You rotated a card");
+		Card card = player.getCard(cardId);
+		send(cardId, player, cc, "You rotated " + card.getName());
 
 		Player otherPlayer = game.getPlayers().getOther(player);
-		send(cardId, otherPlayer, cc, "Opponent rotated a card");
+		send(cardId, otherPlayer, cc, "Opponent rotated "
+				+ (card.isFaceup() ? card.getName() : "a card"));
 	}
 }

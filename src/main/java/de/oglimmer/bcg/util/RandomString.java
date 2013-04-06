@@ -53,8 +53,8 @@ final public class RandomString {
 	}
 
 	/**
-	 * Creates a size byte long unicode string. All chars are between a..z and
-	 * A..Z
+	 * Creates a size byte long string. All chars are between a..z and A..Z and
+	 * 0..9
 	 * 
 	 * @param size
 	 * @return

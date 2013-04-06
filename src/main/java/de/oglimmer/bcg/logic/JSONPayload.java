@@ -2,7 +2,7 @@ package de.oglimmer.bcg.logic;
 
 public enum JSONPayload {
 
-	BASE, COUNTER, ID;
+	BASE, COUNTER, ID, HIGHLIGHT;
 
 	public boolean in(JSONPayload[] array) {
 		for (JSONPayload aPayload : array) {

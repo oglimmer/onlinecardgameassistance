@@ -14,32 +14,15 @@ return declare(null, {
 		this.menuHandler = new MenuHandler(remoteMsgSender);
 	},
 	
+	/* ---- handler ---- */
+	
 	errorHandler: function(v) {
 		dom.byId("overlay").style.display = "block";
 		dom.byId("overlayText").innerHTML = "Error:<br/><br/>"+v+"<br/><br/><a href='portal.htm'>Back to main screen</a>";
 	},
 
-	setBorders: function(v) {
-		var borderNode = dom.byId("horizontalBorder");
-		if(win.getBox().h > v.browserHeight) {
-			borderNode.style.width = Math.min(v.browserWidth, win.getBox().w)+"px";
-			borderNode.style.top = (v.browserHeight*0.76)+"px";
-		} else {
-			borderNode.style.width = "0px";
-			borderNode.style.top = "0px";			
-		}
-		borderNode = dom.byId("verticalBorder");
-		if(win.getBox().w > v.browserWidth) {
-			borderNode.style.left = v.browserWidth+"px";
-			borderNode.style.height = (Math.min(v.browserHeight, win.getBox().h)*0.76)+"px";
-		} else {
-			borderNode.style.left = "0px";
-			borderNode.style.height = "0px";			
-		}		
-	},
-	
 	initHandler: function(v) {
-		this.setBorders(v);
+		this._setBorders(v);
 		// if the "tableArea" is already populated, don't send init-action again		
 		if(dom.byId("tableArea").innerHTML == "") {
 			this.remoteMsgSender.sendInitMsg();
@@ -59,13 +42,7 @@ return declare(null, {
 	
 	toggleHighlightHandler: function(v) {
 		var toHighlight = dom.byId(v.id);
-		if(v.hl) {
-			toHighlight.style.border = "3px solid yellow";
-			toHighlight.style.boxShadow= "3px 3px 1px #888888";
-		} else {
-			toHighlight.style.border = "";
-			toHighlight.style.boxShadow= "";
-		}
+		this._setHighlight(toHighlight, v.hl);
 		this.messageHandler(v);
 		this.infoHandler(v);
 	},
@@ -80,7 +57,7 @@ return declare(null, {
 	},
 	
 	modCounterHandler: function(v) {
-		dom.byId("TXT"+v.id).innerHTML = this.getCounter(v);
+		dom.byId("TXT"+v.id).innerHTML = this._getCounter(v);
 		this.messageHandler(v);
 		this.infoHandler(v);
 	},
@@ -96,17 +73,9 @@ return declare(null, {
 			domConstruct.create("li", {innerHTML: v.messageItem}, this.idFromMessages, "first");
 		}
 	},
+
 	
-	discardHandler: function(v) {
-		var toDestroy = dom.byId(v.id);
-		if(toDestroy!==null) {
-			domConstruct.destroy(toDestroy);
-		}
-		this.messageHandler(v);
-		this.infoHandler(v);
-	},
-	
-	/* called from: FlipCardAction (your/other card), ReturnToDeckAction/TakeCardPlayOnTableAction/TakeCardIntoHandAction (deck) */
+	/* called from: FlipCardAction (your/other card), ReturnToDeck/DeckToTable/DeckToHand (deck) */
 	updateImageHandler: function(v) {		
 		var node = dom.byId(v.id);
 		
@@ -127,7 +96,7 @@ return declare(null, {
 		this.infoHandler(v);
 	},
 	
-	/* answer from sendRotateCard for your and opponents cards*/
+	/* answer from RotateCard for your and opponents cards*/
 	rotateCardHandler : function(v) {
 		var node = dom.byId(v.cardId);
 		if(node.bcgRotated=="1") {
@@ -163,7 +132,7 @@ return declare(null, {
 		}).play();
 	},
 	
-	/* answer from sendPlayCardOnTable for your cards */
+	/* answer from HandToTable for your cards */
 	playCardHandler: function(v) {
 		var node = dom.byId(v.id);
 		this.menuHandler.removeMenu(v.id);
@@ -182,14 +151,14 @@ return declare(null, {
 		this.infoHandler(v);
 	},
 	
-	/* answer from takeCardIntoHand or sendPlayCardOnTable for opponents cards */	
+	/* answer from DeckToHand or HandToTable for opponents cards */	
 	createCardHandler: function(v) {
 		var areaNode = dom.byId(v.areaId);
 		if(typeof(areaNode)=='undefined'||areaNode==null) {
 			console.log("Unable to find areaId = "+v.areaId);
 			return;
 		}
-		this.createDivImage(v, areaNode);
+		this._createDivImage(v, areaNode);
 		
 		this.messageHandler(v);
 		this.infoHandler(v);
@@ -216,13 +185,15 @@ return declare(null, {
 				}, newDiv);
 			} else {
 				arrayUtil.forEach(item.cardDecks, function(deckItem, index) {
-					self.createDivImage(deckItem, newDiv);
+					self._createDivImage(deckItem, newDiv);
 				});
 			}
 		});			
 	},
 	
-	createCardZoom: function(c, v) {
+	/* ---- private methods ---- */
+	
+	_createCardZoom: function(c, v) {
 		function removeZoomCard() {
 			var toDestroy = dom.byId("ZOOMCARD");
 			if(toDestroy!==null) {
@@ -250,7 +221,7 @@ return declare(null, {
 		});	
 	},
 	
-	createDivImage: function(v, areaNode) {
+	_createDivImage: function(v, areaNode) {
 		var card = domConstruct.create("div", {			
 			id : v.id,
 			style : {
@@ -266,7 +237,7 @@ return declare(null, {
 			id: "IMG"+v.id			
 		}, card);
 		domConstruct.create("div", {
-			innerHTML: this.getCounter(v),
+			innerHTML: this._getCounter(v),
 			id: "TXT"+v.id,
 			style : {				
 				position: "absolute",
@@ -281,12 +252,9 @@ return declare(null, {
 			}
 		}, card);
 		
-		if(v.hl) {
-			card.style.border = "3px solid yellow";
-			card.style.boxShadow= "3px 3px 1px #888888";
-		}
+		this._setHighlight(card, v.hl);
 		
-		this.createCardZoom(card, v);
+		this._createCardZoom(card, v);
 		
 		this.menuHandler.addMenu(card, v.menu);
 		
@@ -297,7 +265,7 @@ return declare(null, {
 		return card;
 	},
 
-	getCounter: function(v) {
+	_getCounter: function(v) {
 		var html;
 		if(typeof(v.counter0)!='undefined'&&typeof(v.counter1)!='undefined'&&typeof(v.counter2)!='undefined') {
 			html = "";
@@ -324,7 +292,36 @@ return declare(null, {
 			html = "";
 		}
 		return html;
-	}
+	},
+	
+	_setHighlight: function(card, hl) {
+		if(hl) {
+			card.style.border = "3px solid yellow";
+			card.style.boxShadow= "3px 3px 1px #888888";	
+		} else {
+			card.style.border = "";
+			card.style.boxShadow= "";				
+		} 
+	},
+	
+	_setBorders: function(v) {
+		var borderNode = dom.byId("horizontalBorder");
+		if(win.getBox().h > v.browserHeight) {
+			borderNode.style.width = Math.min(v.browserWidth, win.getBox().w)+"px";
+			borderNode.style.top = (v.browserHeight*0.76)+"px";
+		} else {
+			borderNode.style.width = "0px";
+			borderNode.style.top = "0px";			
+		}
+		borderNode = dom.byId("verticalBorder");
+		if(win.getBox().w > v.browserWidth) {
+			borderNode.style.left = v.browserWidth+"px";
+			borderNode.style.height = (Math.min(v.browserHeight, win.getBox().h)*0.76)+"px";
+		} else {
+			borderNode.style.left = "0px";
+			borderNode.style.height = "0px";			
+		}		
+	}	
 	
 });
 

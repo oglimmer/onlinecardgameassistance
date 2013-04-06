@@ -10,7 +10,7 @@ import de.oglimmer.bcg.logic.Player;
 public class ToggleHighlightAction extends AbstractAction implements Action {
 
 	private void send(Card card, Player player, ClientChannel cc) {
-		JSONObject cardJSON = card.toJSON(player, JSONPayload.BASE);
+		JSONObject cardJSON = card.toJSON(player, JSONPayload.HIGHLIGHT);
 		send(player, cc, "toggleHighlight", cardJSON);
 	}
 

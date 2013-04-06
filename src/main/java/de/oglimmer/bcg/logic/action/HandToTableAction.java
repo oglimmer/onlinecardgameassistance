@@ -8,7 +8,13 @@ import de.oglimmer.bcg.logic.Game;
 import de.oglimmer.bcg.logic.JSONPayload;
 import de.oglimmer.bcg.logic.Player;
 
-public class PlayCardOnTableAction extends AbstractAction implements Action {
+/**
+ * Plays a card face up/down on the table.
+ * 
+ * @author oli
+ * 
+ */
+public class HandToTableAction extends AbstractAction implements Action {
 
 	private JSONObject send(Game game, Player player, Card card) {
 		JSONObject cardJSON = card.toJSON(player, JSONPayload.BASE);
@@ -19,8 +25,8 @@ public class PlayCardOnTableAction extends AbstractAction implements Action {
 	private void sendPlayer(Game game, Player player, ClientChannel cc,
 			Card card, boolean faceUp) {
 		JSONObject cardJSON = send(game, player, card);
-		player.processMessage(cardJSON, "You played a card face "
-				+ (faceUp ? "up" : "down") + " from hand to table");
+		player.processMessage(cardJSON, "You played " + card.getName()
+				+ " face " + (faceUp ? "up" : "down") + " from hand to table");
 		send(player, cc, "playCard", cardJSON);
 	}
 
@@ -28,7 +34,8 @@ public class PlayCardOnTableAction extends AbstractAction implements Action {
 			ClientChannel cc, Card card, boolean faceUp, int playerHandCards) {
 		JSONObject cardJSON = send(game, otherPlayer, card);
 		cardJSON.element("moveable", false);
-		otherPlayer.processMessage(cardJSON, "Opponent played a card face "
+		otherPlayer.processMessage(cardJSON, "Opponent played "
+				+ (faceUp ? card.getName() : "a card") + " face "
 				+ (faceUp ? "up" : "down") + " from hand to table");
 		addInfoText(playerHandCards, cardJSON);
 

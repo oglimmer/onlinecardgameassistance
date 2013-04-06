@@ -1,13 +1,14 @@
-package de.oglimmer.bcg.logic;
+package de.oglimmer.bcg.logic.swlcg;
 
 import java.util.Collection;
 
 import net.sf.json.JSONObject;
+import de.oglimmer.bcg.logic.Player;
 
-public class CommitForceCard extends Card {
+public class CommitForceCard extends SwlcgCard {
 
 	public CommitForceCard(Player player, String imageUrl) {
-		super(player, null, imageUrl, imageUrl);
+		super(player, null, "Committed to the Force card", imageUrl, imageUrl);
 	}
 
 	@Override

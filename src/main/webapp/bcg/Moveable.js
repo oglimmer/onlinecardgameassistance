@@ -2,10 +2,12 @@ define(["dojo/_base/declare", "dojo/dnd/Moveable"], function(declare, Moveable) 
 
 return declare(Moveable, {
 	
+	node: null,
 	nodeConfig:null,
 	sendMoveCardMsg:null,
 	
 	constructor: function(node, nodeConfig, sendMoveCardMsg) {
+		this.node = node;
 		this.nodeConfig = nodeConfig;
 		this.sendMoveCardMsg = sendMoveCardMsg;
 	},
@@ -32,10 +34,15 @@ return declare(Moveable, {
 	},
 	
 	onMouseDown : function(e) {
+		// prevent "start move" when right-clicking 
 		if(e.button == 2) {
 			return;
 		}
 		this.inherited(arguments);
+	},
+	
+	onFirstMove: function(mover, e) {
+		this.node.moved = true;
 	}
 	
 	

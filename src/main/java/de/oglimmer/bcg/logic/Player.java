@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import net.sf.json.JSONObject;
+import de.oglimmer.bcg.logic.config.GameConfig;
 import de.oglimmer.bcg.util.JSONTransformable;
 import de.oglimmer.bcg.util.RandomString;
 
@@ -16,21 +17,22 @@ public class Player implements JSONTransformable {
 	private String id;
 	private String key;
 	private Game game;
-	private CardsSet cardStacks;
+	private CardsSet cardsSet;
 	private Side side;
 	private boolean connected;
 	private int browserWidth;
 	private int browserHeight;
 	private Collection<String> message = new ArrayList<>();
 
-	public Player(int no, String key, Game game, Side side,
-			InputStream deckStream) {
+	public Player(GameConfig gameConfig, int no, String key, Game game,
+			Side side, InputStream deckStream) {
 		this.id = RandomString.getRandomStringASCII(8);
 		this.no = no;
 		this.key = key;
 		this.game = game;
 		this.side = side;
-		cardStacks = new CardsSet(game, this, deckStream, no);
+		cardsSet = gameConfig.getCardsFactory(game, this, deckStream)
+				.createCardsSet();
 	}
 
 	public Game getGame() {
@@ -54,7 +56,7 @@ public class Player implements JSONTransformable {
 	}
 
 	public CardsSet getCardStacks() {
-		return cardStacks;
+		return cardsSet;
 	}
 
 	public void setConnected(boolean connected) {
@@ -81,6 +83,15 @@ public class Player implements JSONTransformable {
 		return browserHeight;
 	}
 
+	public Collection<String> getMessages() {
+		return message;
+	}
+
+	public void processMessage(JSONObject cardJSON, String text) {
+		cardJSON.element("messageItem", text);
+		message.add(text);
+	}
+
 	/**
 	 * Get card by id (visible for this player, may be on table though)
 	 * 
@@ -88,7 +99,7 @@ public class Player implements JSONTransformable {
 	 * @return
 	 */
 	public Card getCard(String cardId) {
-		for (CardList cs : getCardStacks().getCardStacks().values()) {
+		for (CardList cs : getCardStacks().getCardLists()) {
 			for (Card c : cs.getCards()) {
 				if (c.getId().equals(cardId)) {
 					return c;
@@ -106,7 +117,7 @@ public class Player implements JSONTransformable {
 	 * @return
 	 */
 	public UIElement getUIElement(String id) {
-		for (CardList cs : getCardStacks().getCardStacks().values()) {
+		for (CardList cs : getCardStacks().getCardLists()) {
 			if (cs.getId().equals(id)) {
 				return (CardDeck) cs;
 			}
@@ -128,7 +139,7 @@ public class Player implements JSONTransformable {
 	 * @return
 	 */
 	public CardList getCardListById(String cardsId) {
-		for (CardList cs : cardStacks.getCardStacks().values()) {
+		for (CardList cs : cardsSet.getCardLists()) {
 			if (cs.getId().equals(cardsId)) {
 				return cs;
 			}
@@ -138,13 +149,29 @@ public class Player implements JSONTransformable {
 	}
 
 	/**
+	 * Get a cardList by its name
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public CardList getCardListByName(String name) {
+		for (CardList cs : cardsSet.getCardLists()) {
+			if (cs.getName().equals(name)) {
+				return cs;
+			}
+		}
+		throw new GameException("Player " + no + " has no cardstack with name="
+				+ name);
+	}
+
+	/**
 	 * Get cardList by a card id (for this player)
 	 * 
 	 * @param cardsId
 	 * @return
 	 */
 	public CardList getCardListByCardId(String cardId) {
-		for (CardList cs : getCardStacks().getCardStacks().values()) {
+		for (CardList cs : getCardStacks().getCardLists()) {
 			for (Card c : cs.getCards()) {
 				if (c.getId().equals(cardId)) {
 					return cs;
@@ -158,15 +185,6 @@ public class Player implements JSONTransformable {
 	@Override
 	public String toJSON(Player player, JSONPayload... payload) {
 		return Integer.toString(no);
-	}
-
-	public void processMessage(JSONObject cardJSON, String text) {
-		cardJSON.element("messageItem", text);
-		message.add(text);
-	}
-
-	public Collection<String> getMessages() {
-		return message;
 	}
 
 }

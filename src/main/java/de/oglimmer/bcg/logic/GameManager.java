@@ -1,5 +1,6 @@
 package de.oglimmer.bcg.logic;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -9,6 +10,9 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import de.oglimmer.bcg.logic.config.GameConfig;
+import de.oglimmer.bcg.logic.config.GameConfigManager;
 
 public enum GameManager {
 	INSTANCE;
@@ -30,8 +34,9 @@ public enum GameManager {
 		return game;
 	}
 
-	public synchronized Game createGame() {
-		Game game = new Game();
+	public synchronized Game createGame(InputStream is) {
+		GameConfig gameConfig = GameConfigManager.INSTANCE.getGameConfig(is);
+		Game game = new Game(gameConfig);
 		games.put(game.getId(), game);
 		return game;
 	}

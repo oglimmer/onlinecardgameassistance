@@ -1,7 +1,6 @@
 package de.oglimmer.bcg.logic;
 
-import java.io.InputStream;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -13,16 +12,15 @@ import java.util.Map;
  */
 public class CardsSet {
 
-	private Map<String, CardList> cards = new HashMap<>();
+	private Map<String, CardList> cards;
 
-	public CardsSet(Game game, Player player, InputStream deckStream,
-			int playerNo) {
-		CardsFactory cf = new CardsFactory(game, player, cards, deckStream);
-		cf.createDecks();
+	public CardsSet(Game game, Player player, int playerNo,
+			Map<String, CardList> cards) {
+		this.cards = cards;
 	}
 
-	public Map<String, CardList> getCardStacks() {
-		return cards;
+	public Collection<CardList> getCardLists() {
+		return cards.values();
 	}
 
 	public CardList get(String name) {

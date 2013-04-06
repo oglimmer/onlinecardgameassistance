@@ -15,14 +15,12 @@ public enum ActionFactory {
 
 	private ActionFactory() {
 		def.add(new InitAction());
-		def.add(new TakeCardIntoHandAction());
-		def.add(new PlayCardOnTableAction());
+		def.add(new HandToTableAction());
 		def.add(new MoveCardAction());
 		def.add(new RotateCardAction());
-		def.add(new TakeCardIntoHandAction());
-		def.add(new TakeCardPlayOnTableAction());
+		def.add(new DeckToHandAction());
+		def.add(new DeckToTableAction());
 		def.add(new FlipCardAction());
-		def.add(new DiscardAction());
 		def.add(new PreinitAction());
 		def.add(new PingAction());
 		def.add(new ModCounterAction());
@@ -30,6 +28,8 @@ public enum ActionFactory {
 		def.add(new ShuffleAction());
 		def.add(new ToggleHighlightAction());
 		def.add(new ChangeZIndexAction());
+		def.add(new RefreshAction());
+		def.add(new TableToHandAction());
 	}
 
 	public Action getAction(String actionId) {

@@ -1,13 +1,15 @@
-package de.oglimmer.bcg.logic;
+package de.oglimmer.bcg.logic.swlcg;
 
 import java.util.Collection;
 
 import net.sf.json.JSONObject;
+import de.oglimmer.bcg.logic.Player;
 
-public class DeathStarDialCard extends Card {
+public class DeathStarDialCard extends SwlcgCard {
 
 	public DeathStarDialCard() {
-		super(null, null, "death-star-dial.png", "death-star-dial.png");
+		super(null, null, "Death Star Dial Card", "death-star-dial.png",
+				"death-star-dial.png");
 	}
 
 	@Override
