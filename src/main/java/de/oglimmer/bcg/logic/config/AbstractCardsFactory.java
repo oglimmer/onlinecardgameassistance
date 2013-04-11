@@ -21,6 +21,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import de.oglimmer.bcg.logic.Card;
+import de.oglimmer.bcg.logic.CardDeck;
 import de.oglimmer.bcg.logic.CardList;
 import de.oglimmer.bcg.logic.Game;
 import de.oglimmer.bcg.logic.GameException;
@@ -35,7 +36,7 @@ public abstract class AbstractCardsFactory {
 
 	protected Game game;
 	protected Player owner;
-	protected Map<String, CardList> cards;
+	protected List<CardList> cards;
 	protected String cardBackgroundUrl;
 	protected InputStream deckStream;
 	protected int playerNo;
@@ -44,7 +45,7 @@ public abstract class AbstractCardsFactory {
 			InputStream deckStream, String cardBackgroundUrl) {
 		this.game = game;
 		this.owner = owner;
-		this.cards = new HashMap<>();
+		this.cards = new ArrayList<>();
 		this.deckStream = deckStream;
 		this.playerNo = owner.getNo();
 		this.cardBackgroundUrl = cardBackgroundUrl;
@@ -59,7 +60,7 @@ public abstract class AbstractCardsFactory {
 			for (String[] data : cardData) {
 				String imageUrl = data[0];
 				String cardName = data[1];
-				Card card = clazz.getConstructor(Player.class, CardList.class,
+				Card card = clazz.getConstructor(Player.class, CardDeck.class,
 						String.class, String.class, String.class).newInstance(
 						owner, cardList, cardName, imageUrl, cardBackgroundUrl);
 				cardList.getCards().add(card);
@@ -90,27 +91,9 @@ public abstract class AbstractCardsFactory {
 		throw new GameException("couldn't find " + sectionName + " section");
 	}
 
-	private String getCardnameFromFilename(String cardSetFileName,
+	protected String getCardnameFromFilename(String cardSetFileName,
 			String cardFileName) {
-		StringBuilder tmp = new StringBuilder();
-		String cardSetName = cardSetFileName.substring(1).toLowerCase();
-		cardSetName = cardSetName.substring(0, cardSetName.indexOf("."));
-		// remove the set name, card number and file extension from the card
-		// file name
-		for (int j = cardFileName.length() - 1; j > 0; j--) {
-			if (cardFileName.substring(j).startsWith(cardSetName)) {
-				tmp.append(cardFileName.substring(0, j - 1));
-			}
-		}
-		// make it nicely readable (remove hyphens and make Camelcase
-		StringBuilder cardName = new StringBuilder();
-		for (String s : tmp.toString().split("-")) {
-			if (cardName.length() > 0) {
-				cardName.append(' ');
-			}
-			cardName.append(s.substring(0, 1).toUpperCase() + s.substring(1));
-		}
-		return cardName.toString();
+		return cardFileName;
 	}
 
 	/**
@@ -189,7 +172,7 @@ public abstract class AbstractCardsFactory {
 
 						String cardId = n.getAttributes().getNamedItem("Id")
 								.getNodeValue();
-
+						log.debug(cardId + " => " + fileName + "~" + cardName);
 						idCardDataCache.put(cardId, new String[] { fileName,
 								cardName });
 					}

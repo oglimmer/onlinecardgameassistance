@@ -5,7 +5,7 @@ import java.util.Collection;
 import net.sf.json.JSONObject;
 import de.oglimmer.bcg.logic.Player;
 
-public class BalanceOfTheForceCard extends SwlcgCard {
+class BalanceOfTheForceCard extends SwlcgObjectiveCard {
 
 	public BalanceOfTheForceCard() {
 		super(null, null, "Balance of the Force Card", "balance_light.jpg",

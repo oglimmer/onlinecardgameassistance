@@ -22,12 +22,14 @@ public class PreinitAction extends AbstractAction implements Action {
 			JSONObject op = new JSONObject();
 			op.element("browserWidth", otherPlayer.getBrowserWidth());
 			op.element("browserHeight", otherPlayer.getBrowserHeight());
+			op.element("imageBasePath", game.getType());
 
 			send(player, cc, "init", op);
 
 			JSONObject op2 = new JSONObject();
 			op2.element("browserWidth", player.getBrowserWidth());
 			op2.element("browserHeight", player.getBrowserHeight());
+			op2.element("imageBasePath", game.getType());
 
 			send(otherPlayer, cc, "init", op2);
 		}

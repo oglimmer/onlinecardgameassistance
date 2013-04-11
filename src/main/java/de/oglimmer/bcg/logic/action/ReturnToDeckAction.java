@@ -35,12 +35,11 @@ public class ReturnToDeckAction extends AbstractAction implements Action {
 			checkDeckPlus(targetPlayer, targetDeck, msg);
 		}
 
-		if (!owner) {
-			// the opponent needs to be updated for the owners hand cards
-			Player otherPlayer = targetPlayer.getGame().getPlayers()
-					.getOther(targetPlayer);
-			addInfoText(otherPlayer, cardJSON);
-		}
+		// the opponent needs to be updated for the owners hand cards
+		// but both players might need an update on the info text
+		Player otherPlayer = targetPlayer.getGame().getPlayers()
+				.getOther(targetPlayer);
+		addInfoText(otherPlayer, cardJSON);
 
 		send(targetPlayer, cc, msg);
 	}
@@ -50,22 +49,23 @@ public class ReturnToDeckAction extends AbstractAction implements Action {
 			CardDeck targetDeck) {
 		Player opponent = game.getPlayers().getOther(player);
 
-		if ("hand".equals(oldCardList.getName())
+		if (CardList.LISTNAME_HAND.equals(oldCardList.getName())
 				&& !targetDeck.isOpenCardList()) {
 			// if the card was in the hand and it doesn't go to an open deck =>
 			// just send a message to the opponent
-			String txt = "Opponent returned a card to the " + location
-					+ " of the " + targetDeck.getName();
+			String txt = "Opponent put a card to the " + location + " of the "
+					+ targetDeck.getDescription();
 			List<Object[]> msg = new ArrayList<>();
-			addMessage(game, opponent, cc, msg, txt);
+			addMessage(opponent, cc, msg, txt);
 			addInfoText(player, msg);
 
 			send(opponent, cc, msg);
 		} else {
 			// card was open or goes to an open deck => send full card update
-			String txt = "Opponent returned "
+			String txt = "Opponent put "
 					+ (card.isFaceup() ? card.getName() : "a card")
-					+ " to the " + location + " of the " + targetDeck.getName();
+					+ " to the " + location + " of the "
+					+ targetDeck.getDescription();
 
 			send(opponent, cc, card, targetDeck, txt, false);
 		}
@@ -73,9 +73,13 @@ public class ReturnToDeckAction extends AbstractAction implements Action {
 
 	private void sendOwner(Player owner, ClientChannel cc, String location,
 			Card card, CardDeck targetDeck) {
-		send(owner, cc, card, targetDeck, "You returned "
-				+ (card.isFaceup() ? card.getName() : "a card") + " to the "
-				+ location + " of the " + targetDeck.getName(), true);
+		send(owner,
+				cc,
+				card,
+				targetDeck,
+				"You put " + (card.isFaceup() ? card.getName() : "a card")
+						+ " to the " + location + " of the "
+						+ targetDeck.getDescription(), true);
 	}
 
 	private CardDeck returnToTargetDeck(String deckName, String location,

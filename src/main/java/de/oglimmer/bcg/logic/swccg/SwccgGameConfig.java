@@ -1,4 +1,4 @@
-package de.oglimmer.bcg.logic.swlcg;
+package de.oglimmer.bcg.logic.swccg;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -13,67 +13,38 @@ import javax.servlet.http.HttpServletRequest;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.fourspaces.couchdb.Database;
-import com.fourspaces.couchdb.Document;
-
 import de.oglimmer.bcg.logic.BoardArea;
 import de.oglimmer.bcg.logic.CardDeck;
 import de.oglimmer.bcg.logic.CardsSet;
 import de.oglimmer.bcg.logic.Game;
-import de.oglimmer.bcg.logic.GameException;
 import de.oglimmer.bcg.logic.GameManager;
 import de.oglimmer.bcg.logic.Player;
 import de.oglimmer.bcg.logic.Side;
 import de.oglimmer.bcg.logic.action.InfoBoxUpdater;
-import de.oglimmer.bcg.logic.config.BoardFactory;
 import de.oglimmer.bcg.logic.config.CardsFactory;
 import de.oglimmer.bcg.logic.config.DefaultBoardFactory;
 import de.oglimmer.bcg.logic.config.GameConfig;
 import de.oglimmer.bcg.servlet.ServletUtil;
 
-public class SwlcgGameConfig implements GameConfig {
+public class SwccgGameConfig implements GameConfig {
 
-	private static final String GENERATE_DECK_XML_URL = "http://swlcg.oglimmer.de/gen.groovy?affi=%s&cards=%s";
-
-	private static final Logger log = LoggerFactory
-			.getLogger(SwlcgGameConfig.class);
-
-	private InfoBoxUpdater infoBoxUpdater = new SwlcgInfoBoxUpdater();
+	private BoardFactory bf = new BoardFactory();
+	private SwccgInfoBoxUpdater infoBoxUpdater = new SwccgInfoBoxUpdater();
 
 	@Override
 	public CardsFactory getCardsFactory(Game game, Player player,
 			InputStream deckStream) {
-		return new SwlcgCardsFactory(game, player, deckStream);
+		return new SwccgCardsFactory(game, player, deckStream);
 	}
 
 	@Override
 	public BoardFactory getBoardFactory() {
-		return new DefaultBoardFactory() {
-			@Override
-			protected void addCardListAssociations(BoardArea ba,
-					Player player0, Player player1) {
-				if (ba.getName().equals("table")) {
-					CardsSet cardStacksPlayer = player0.getCardStacks();
-					ba.addCardDeck((CardDeck) cardStacksPlayer.get("discard"));
-
-					cardStacksPlayer = player1.getCardStacks();
-					ba.addCardDeck((CardDeck) cardStacksPlayer.get("discard"));
-				} else if (ba.getName().equals("hand")) {
-					CardsSet cardStacksPlayer = player0.getCardStacks();
-					ba.addCardDeck((CardDeck) cardStacksPlayer.get("command"));
-					ba.addCardDeck((CardDeck) cardStacksPlayer.get("objective"));
-				}
-			}
-		};
+		return bf;
 	}
 
 	@Override
 	public String getType() {
-		return "swlcg";
+		return "swccg";
 	}
 
 	@SuppressWarnings("unchecked")
@@ -93,23 +64,19 @@ public class SwlcgGameConfig implements GameConfig {
 				side = deck.getString("side");
 			}
 		}
-		return side.equalsIgnoreCase("dark") ? SwlcgSide.DARK : SwlcgSide.LIGHT;
+		return side.equalsIgnoreCase("dark") ? SwccgSide.DARK : SwccgSide.LIGHT;
 	}
 
 	@Override
 	public InputStream getDeckStream(String deckId) throws IOException,
 			MalformedURLException {
-		Database db = ServletUtil.getDatabase();
-		Document doc = db.getDocument(deckId);
-		if (doc == null) {
-			throw new GameException("no deck with id=" + deckId);
-		}
-		String affi = doc.getString("affiliation").replace(" ", "%20");
-		String cards = doc.getString("blocks").replace('-', ',');
+		// Database db = ServletUtil.getDatabase();
+		// Document doc = db.getDocument(deckId);
+		// if (doc == null) {
+		// throw new GameException("no deck with id=" + deckId);
+		// }
 
-		String urlString = String.format(GENERATE_DECK_XML_URL, affi, cards);
-		log.debug("url=" + urlString);
-		URL url = new URL(urlString);
+		URL url = new URL("file:///Users/oli/Desktop/" + deckId);
 		URLConnection con = url.openConnection();
 		con.setUseCaches(false);
 		return copyContentAsBufferedInputStream(con);
@@ -134,4 +101,26 @@ public class SwlcgGameConfig implements GameConfig {
 		return infoBoxUpdater;
 	}
 
+	private static class BoardFactory extends DefaultBoardFactory {
+		@Override
+		protected void addCardListAssociations(BoardArea ba, Player player0,
+				Player player1) {
+			if (CardDeck.LISTNAME_TABLE.equals(ba.getName())) {
+				associateDecksWithBoard(ba, player0.getCardStacks());
+				associateDecksWithBoard(ba, player1.getCardStacks());
+			}
+		}
+
+		private void associateDecksWithBoard(BoardArea ba,
+				CardsSet cardStacksPlayer) {
+			ba.addCardDeck((CardDeck) cardStacksPlayer
+					.get(SwccgCardDeck.DECKNAME_RESERVEDECK));
+			ba.addCardDeck((CardDeck) cardStacksPlayer
+					.get(SwccgCardDeck.DECKNAME_LOSTPILE));
+			ba.addCardDeck((CardDeck) cardStacksPlayer
+					.get(SwccgCardDeck.DECKNAME_USEDPILE));
+			ba.addCardDeck((CardDeck) cardStacksPlayer
+					.get(SwccgCardDeck.DECKNAME_FORCEPILE));
+		}
+	}
 }

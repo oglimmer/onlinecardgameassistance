@@ -21,7 +21,12 @@
 
 	<div id="mainDiv" style="border:3px solid black;padding:5px;font-family:Arial;margin-bottom:5px;">
 		<% if( (Boolean)session.getAttribute("permissionStartGame") ) { %>
-		To start a new game click <button onclick="document.location.href='start.htm'">here</button><br/><br/><br/>
+		To start a new
+		<select id="gametype">
+			<option value="swlcg">SWLCG</option>
+			<option value="swccg">SWCCG</option>
+		</select>
+		click <button onclick="document.location.href='start.htm?gametype='+document.getElementById('gametype').value">here</button><br/><br/><br/>
 		<% } else { %>
 		You are not authorized to start a game, but you can wait until somebody else created one.<br/><br/><br/>
 		<% } %>
@@ -29,7 +34,7 @@
 		To join another game select one 
 		<select id="gameList">
 		<% for(Game g: GameManager.INSTANCE.getOpenGames()) { %>
-			<option value="<%=g.getId()%>"><%= g.getName()%></option>
+			<option value="<%=g.getId()%>"><%= g.getName()+" ("+g.getType()+")"%></option>
 		<% } %>
 		</select>
 		and click <button onclick="if(document.getElementById('gameList').value!='') document.location.href='join.htm?gameId='+document.getElementById('gameList').value; else alert('No game selected!');">here</button> or <a href="javascript:window.location.reload();">here</a> to refresh		
@@ -40,14 +45,14 @@
 		%>
 			<br/><br/><br/>You are registered in running games:<br/>
 			<% for(Player p : playerInGames) { %>
-			Click <button onclick="document.location.href='game.htm?gameId=<%=p.getGame().getId()%>&playerId=<%=p.getId()%>'">here</button> to rejoin <%=p.getGame().getName() %> (created: <%=df.format(p.getGame().getCreated()) %>)<br/>
+			Click <button onclick="document.location.href='game.htm?gameId=<%=p.getGame().getId()%>&playerId=<%=p.getId()%>'">here</button> to rejoin <%=p.getGame().getName()+" ("+p.getGame().getType()+")" %> (created: <%=df.format(p.getGame().getCreated()) %>)<br/>
 			<%	} %>
 		<%	} %>
 	</div>
 	<script type="text/javascript">
 	$(function() {
 		if ($.browser.opera || $.browser.msie) {
-			$("#mainDiv").html("Your browser sucks. Please use Chrome, Firefox, Safari.");
+			$("#mainDiv").html("Your browser sucks. Please use Chrome, Firefox or Safari.");
 		}
 	});
 	</script>

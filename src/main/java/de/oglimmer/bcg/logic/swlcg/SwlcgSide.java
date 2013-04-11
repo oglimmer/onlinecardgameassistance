@@ -2,7 +2,7 @@ package de.oglimmer.bcg.logic.swlcg;
 
 import de.oglimmer.bcg.logic.Side;
 
-public class SwlcgSide implements Side {
+class SwlcgSide implements Side {
 
 	public static final Side DARK = new SwlcgSide("dark");
 	public static final Side LIGHT = new SwlcgSide("light");

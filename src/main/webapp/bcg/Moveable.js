@@ -6,10 +6,11 @@ return declare(Moveable, {
 	nodeConfig:null,
 	sendMoveCardMsg:null,
 	
-	constructor: function(node, nodeConfig, sendMoveCardMsg) {
+	constructor: function(node, params, nodeConfig, sendMoveCardMsg) {
 		this.node = node;
 		this.nodeConfig = nodeConfig;
 		this.sendMoveCardMsg = sendMoveCardMsg;
+		this.delay= 5;
 	},
 	
 	onMoveStop : function() {

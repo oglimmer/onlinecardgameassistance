@@ -5,7 +5,7 @@ import java.util.Collection;
 import net.sf.json.JSONObject;
 import de.oglimmer.bcg.logic.Player;
 
-public class DeathStarDialCard extends SwlcgCard {
+public class DeathStarDialCard extends SwlcgObjectiveCard {
 
 	public DeathStarDialCard() {
 		super(null, null, "Death Star Dial Card", "death-star-dial.png",

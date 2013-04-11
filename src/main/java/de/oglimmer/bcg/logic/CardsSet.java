@@ -1,7 +1,7 @@
 package de.oglimmer.bcg.logic;
 
 import java.util.Collection;
-import java.util.Map;
+import java.util.List;
 
 /**
  * A set of cards (cards = set of cards). So this represents a Set of Set of
@@ -12,19 +12,23 @@ import java.util.Map;
  */
 public class CardsSet {
 
-	private Map<String, CardList> cards;
+	private List<CardList> cards;
 
-	public CardsSet(Game game, Player player, int playerNo,
-			Map<String, CardList> cards) {
+	public CardsSet(Game game, Player player, int playerNo, List<CardList> cards) {
 		this.cards = cards;
 	}
 
 	public Collection<CardList> getCardLists() {
-		return cards.values();
+		return cards;
 	}
 
 	public CardList get(String name) {
-		return cards.get(name);
+		for (CardList cl : cards) {
+			if (cl.getName().equals(name)) {
+				return cl;
+			}
+		}
+		return null;
 	}
 
 }

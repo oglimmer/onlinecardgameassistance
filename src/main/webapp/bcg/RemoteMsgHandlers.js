@@ -8,6 +8,7 @@ return declare(null, {
 	remoteMsgSender: null,
 	idFromMessages:null,
 	menuHandler:null,
+	imageBasePath:null,
 	
 	constructor: function(remoteMsgSender) {
 		this.remoteMsgSender = remoteMsgSender;
@@ -23,6 +24,7 @@ return declare(null, {
 
 	initHandler: function(v) {
 		this._setBorders(v);
+		this.imageBasePath = v.imageBasePath;
 		// if the "tableArea" is already populated, don't send init-action again		
 		if(dom.byId("tableArea").innerHTML == "") {
 			this.remoteMsgSender.sendInitMsg();
@@ -86,7 +88,7 @@ return declare(null, {
 			}).play();
 		}
 		
-		dom.byId("IMG"+v.id).src = "cards/"+ v.imageUrl;
+		dom.byId("IMG"+v.id).src = this.imageBasePath+"/cards/"+ v.imageUrl;
 		
 		this.menuHandler.removeMenu(v.id);
 		
@@ -143,8 +145,8 @@ return declare(null, {
 		
 		this.menuHandler.addMenu(v, v.menu);
 		
-		if(dom.byId("IMG"+v.id).src != "cards/"+v.imageUrl) {
-			dom.byId("IMG"+v.id).src  = "cards/"+v.imageUrl;
+		if(dom.byId("IMG"+v.id).src != this.imageBasePath+"/cards/"+v.imageUrl) {
+			dom.byId("IMG"+v.id).src  = this.imageBasePath+"/cards/"+v.imageUrl;
 		}
 		
 		this.messageHandler(v);
@@ -233,7 +235,7 @@ return declare(null, {
 			}
 		}, areaNode);
 		domConstruct.create("img", {
-			src : "cards/"+v.imageUrl,
+			src : this.imageBasePath+"/cards/"+v.imageUrl,
 			id: "IMG"+v.id			
 		}, card);
 		domConstruct.create("div", {
@@ -259,7 +261,7 @@ return declare(null, {
 		this.menuHandler.addMenu(card, v.menu);
 		
 		if(v.moveable) {	
-			new Moveable(card, v, this.remoteMsgSender.sendMoveCardMsg.bind(this.remoteMsgSender));
+			new Moveable(card, {}, v, this.remoteMsgSender.sendMoveCardMsg.bind(this.remoteMsgSender));
 		}
 		
 		return card;

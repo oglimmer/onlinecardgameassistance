@@ -30,6 +30,7 @@ public enum ActionFactory {
 		def.add(new ChangeZIndexAction());
 		def.add(new RefreshAction());
 		def.add(new TableToHandAction());
+		def.add(new DeckToDeckAction());
 	}
 
 	public Action getAction(String actionId) {

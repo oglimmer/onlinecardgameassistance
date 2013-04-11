@@ -22,7 +22,7 @@ public class HandToTableAction extends AbstractAction implements Action {
 		return cardJSON;
 	}
 
-	private void sendPlayer(Game game, Player player, ClientChannel cc,
+	private void sendOwner(Game game, Player player, ClientChannel cc,
 			Card card, boolean faceUp) {
 		JSONObject cardJSON = send(game, player, card);
 		player.processMessage(cardJSON, "You played " + card.getName()
@@ -30,14 +30,14 @@ public class HandToTableAction extends AbstractAction implements Action {
 		send(player, cc, "playCard", cardJSON);
 	}
 
-	private void sendOtherPlayer(Game game, Player otherPlayer,
-			ClientChannel cc, Card card, boolean faceUp, int playerHandCards) {
+	private void sendOpponent(Game game, Player owner, Player otherPlayer,
+			ClientChannel cc, Card card, boolean faceUp) {
 		JSONObject cardJSON = send(game, otherPlayer, card);
 		cardJSON.element("moveable", false);
 		otherPlayer.processMessage(cardJSON, "Opponent played "
 				+ (faceUp ? card.getName() : "a card") + " face "
 				+ (faceUp ? "up" : "down") + " from hand to table");
-		addInfoText(playerHandCards, cardJSON);
+		addInfoText(owner, cardJSON);
 
 		send(otherPlayer, cc, "createCard", cardJSON);
 	}
@@ -54,10 +54,10 @@ public class HandToTableAction extends AbstractAction implements Action {
 		cardStacks.get("table").getCards().add(card);
 		card.setFaceup(faceUp);
 
-		sendPlayer(game, player, cc, card, faceUp);
+		sendOwner(game, player, cc, card, faceUp);
 
-		sendOtherPlayer(game, game.getPlayers().getOther(player), cc, card,
-				faceUp, cardStacks.get("hand").getCards().size());
+		sendOpponent(game, player, game.getPlayers().getOther(player), cc,
+				card, faceUp);
 	}
 
 }

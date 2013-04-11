@@ -12,7 +12,7 @@
 <body>
 
 	<div style="border:3px solid black;padding:5px;font-family:Arial;margin-bottom:5px;">
-		New Game
+		New Game <%=request.getParameter("gametype") %>
 	</div>
 
 	<div style="border:3px solid black;padding:5px;font-family:Arial;margin-bottom:5px;">
@@ -20,13 +20,15 @@
 		<select id="deckList">
 		<% 
 			boolean validDeckFound = false;
-			JSONArray decksList = (JSONArray) session.getAttribute("deckList");
-			for(JSONObject deck : (Collection<JSONObject>)decksList) {
-				if(deck.getBoolean("valid")) {
-					validDeckFound = true;
+			JSONArray decksList = (JSONArray) request.getAttribute("deckList");
+			if(decksList!=null) {
+				for(JSONObject deck : (Collection<JSONObject>)decksList) {
+					if(deck.getBoolean("valid")) {
+						validDeckFound = true;
 		%>
 			<option value="<%=deck.getString("id")%>"><%= deck.getString("name")+" ("+deck.getString("side")+")"%></option>
 		<% 
+					}
 				}
 			}
 		%>
@@ -34,7 +36,7 @@
 		<% if (!validDeckFound) { %>
 			You don't have a valid deck. <a href="portal.htm">Back</a>
 		<% } else { %>
-		Click <button	onclick="document.location.href='prepare.htm?deckId='+document.getElementById('deckList').value;">here</button> and wait for another player to join.
+		Click <button	onclick="document.location.href='prepare.htm?gametype=<%=request.getParameter("gametype")%>&deckId='+document.getElementById('deckList').value;">here</button> and wait for another player to join.
 		<% } %>
 	</div>
 </body>

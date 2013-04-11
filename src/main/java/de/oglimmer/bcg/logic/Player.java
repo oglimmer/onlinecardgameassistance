@@ -99,6 +99,14 @@ public class Player implements JSONTransformable {
 	 * @return
 	 */
 	public Card getCard(String cardId) {
+		Card c = getCardById(cardId);
+		if (c == null) {
+			throw new GameException("Player has no card with id=" + cardId);
+		}
+		return c;
+	}
+
+	private Card getCardById(String cardId) {
 		for (CardList cs : getCardStacks().getCardLists()) {
 			for (Card c : cs.getCards()) {
 				if (c.getId().equals(cardId)) {
@@ -106,7 +114,7 @@ public class Player implements JSONTransformable {
 				}
 			}
 		}
-		throw new GameException("Player has no card with id=" + cardId);
+		return null;
 	}
 
 	/**
@@ -117,19 +125,13 @@ public class Player implements JSONTransformable {
 	 * @return
 	 */
 	public UIElement getUIElement(String id) {
-		for (CardList cs : getCardStacks().getCardLists()) {
-			if (cs.getId().equals(id)) {
-				return (CardDeck) cs;
-			}
-			for (Card c : cs.getCards()) {
-				if (c.getId().equals(id)) {
-					return c;
-				}
-			}
+		Card c = getCardById(id);
+		if (c != null) {
+			return c;
+		} else {
+			CardList cs = game.getBoard().getCardListById(id);
+			return (CardDeck) cs;
 		}
-
-		CardList cs = game.getBoard().getCardList(id);
-		return (CardDeck) cs;
 	}
 
 	/**
@@ -149,23 +151,7 @@ public class Player implements JSONTransformable {
 	}
 
 	/**
-	 * Get a cardList by its name
-	 * 
-	 * @param name
-	 * @return
-	 */
-	public CardList getCardListByName(String name) {
-		for (CardList cs : cardsSet.getCardLists()) {
-			if (cs.getName().equals(name)) {
-				return cs;
-			}
-		}
-		throw new GameException("Player " + no + " has no cardstack with name="
-				+ name);
-	}
-
-	/**
-	 * Get cardList by a card id (for this player)
+	 * Get cardList where a certain card is located (for this player)
 	 * 
 	 * @param cardsId
 	 * @return

@@ -21,18 +21,30 @@ public class Board {
 		this.areas = areas;
 	}
 
-	public String getCardList(Card card) {
+	/**
+	 * Get a cardlist where a certain card is located
+	 * 
+	 * @param card
+	 * @return
+	 */
+	public CardList getCardListByCard(Card card) {
 		for (Player p : game.getPlayers().getPlayers()) {
 			for (CardList cl : p.getCardStacks().getCardLists()) {
 				if (cl.getCards().contains(card)) {
-					return cl.getName();
+					return cl;
 				}
 			}
 		}
 		throw new GameException("No card in game with id = " + card.getId());
 	}
 
-	public CardList getCardList(String id) {
+	/**
+	 * Get a CardList by id (for all players)
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public CardList getCardListById(String id) {
 		for (Player p : game.getPlayers().getPlayers()) {
 			for (CardList cl : p.getCardStacks().getCardLists()) {
 				if (cl.getId().equals(id)) {

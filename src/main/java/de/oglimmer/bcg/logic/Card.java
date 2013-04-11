@@ -22,11 +22,11 @@ public abstract class Card implements JSONTransformable, UIElement {
 	protected int x;
 	protected int y;
 	protected int[] counter = new int[3];
-	protected CardList origin;
+	protected CardDeck origin;
 	protected boolean highlight;
 	protected int zIndex = DEFAULT_ZINDEX;
 
-	public Card(Player owner, CardList origin, String name, String imageUrl,
+	public Card(Player owner, CardDeck origin, String name, String imageUrl,
 			String backImageUrl) {
 		this.id = RandomString.getRandomStringASCII(8);
 		this.origin = origin;

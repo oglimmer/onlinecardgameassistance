@@ -6,6 +6,7 @@ import java.util.List;
 import net.sf.json.JSONObject;
 import de.oglimmer.bcg.com.ClientChannel;
 import de.oglimmer.bcg.logic.Card;
+import de.oglimmer.bcg.logic.CardList;
 import de.oglimmer.bcg.logic.Game;
 import de.oglimmer.bcg.logic.JSONPayload;
 import de.oglimmer.bcg.logic.Player;
@@ -15,7 +16,7 @@ import de.oglimmer.bcg.logic.swlcg.DeathStarDialCard;
  * SWLCG action
  * 
  * @author oli
- *
+ * 
  */
 public class RefreshAction extends AbstractAction {
 
@@ -25,7 +26,8 @@ public class RefreshAction extends AbstractAction {
 
 		List<Object[]> msgPly = new ArrayList<>();
 		List<Object[]> msgOpp = new ArrayList<>();
-		for (Card card : player.getCardListByName("table").getCards()) {
+		for (Card card : player.getCardStacks().get(CardList.LISTNAME_TABLE)
+				.getCards()) {
 			if (!(card instanceof DeathStarDialCard) && card.isOwner(player)) {
 				if (card.getCounter(0) > 0) {
 					card.modCounter(-1, 0);

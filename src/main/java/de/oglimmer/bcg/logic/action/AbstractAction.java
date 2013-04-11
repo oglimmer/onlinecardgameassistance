@@ -8,7 +8,6 @@ import net.sf.json.JSONObject;
 import de.oglimmer.bcg.com.ClientChannel;
 import de.oglimmer.bcg.logic.CardDeck;
 import de.oglimmer.bcg.logic.CardList;
-import de.oglimmer.bcg.logic.Game;
 import de.oglimmer.bcg.logic.Player;
 
 public abstract class AbstractAction implements Action {
@@ -40,23 +39,18 @@ public abstract class AbstractAction implements Action {
 	}
 
 	protected void addInfoText(Player otherPlayer, JSONObject cardJSON) {
-		addInfoText(otherPlayer.getCardStacks().get("hand").getCards().size(),
-				cardJSON);
+		otherPlayer.getGame().getGameConfig().getInfoBoxUpdater()
+				.addInfoText(otherPlayer, cardJSON);
 	}
 
-	protected void addInfoText(int playerHandCards, JSONObject cardJSON) {
-		cardJSON.element("infoText", "Opponent's hand: " + playerHandCards);
-	}
-
-	protected void sendMessage(Game game, Player player, ClientChannel cc,
-			String text) {
+	protected void sendMessage(Player player, ClientChannel cc, String text) {
 
 		List<Object[]> msg = new ArrayList<>();
-		addMessage(game, player, cc, msg, text);
+		addMessage(player, cc, msg, text);
 		send(player, cc, msg);
 	}
 
-	protected void addMessage(Game game, Player player, ClientChannel cc,
+	protected void addMessage(Player player, ClientChannel cc,
 			List<Object[]> msg, String text) {
 
 		JSONObject cardJSON = new JSONObject();

@@ -7,7 +7,7 @@
 <%@page pageEncoding="utf-8" contentType="text/html;charset=utf-8"
 	session="true"%>
 <%
-	JSONArray decksList = (JSONArray) session.getAttribute("deckList");
+	JSONArray decksList = (JSONArray) request.getAttribute("deckList");
 	String gameId = request.getParameter("gameId");
 	String otherSide = GameManager.INSTANCE.getGame(gameId)
 			.getPlayers().getPlayer(0).getSide().toString();
@@ -20,7 +20,7 @@
 <body>
 
 	<div style="border:3px solid black;padding:5px;font-family:Arial;margin-bottom:5px;">
-		Join a game
+		Join a <%=GameManager.INSTANCE.getGame(gameId).getType() %> game
 	</div>
 
 	<div style="border:3px solid black;padding:5px;font-family:Arial;margin-bottom:5px;">
@@ -28,12 +28,14 @@
 		<select id="deckList">
 			<%
 				boolean validDeckFound = false;
-				for(JSONObject deck : (Collection<JSONObject>)decksList) {
-					if(!deck.getString("side").equalsIgnoreCase(otherSide) && deck.getBoolean("valid")){
-						validDeckFound = true;
+				if(decksList!=null) {
+					for(JSONObject deck : (Collection<JSONObject>)decksList) {
+						if(!deck.getString("side").equalsIgnoreCase(otherSide) && deck.getBoolean("valid")){
+							validDeckFound = true;
 			%>		
 						<option value="<%=deck.getString("id")%>"><%= deck.getString("name")+" ("+deck.getString("side")+")"%></option>
 			<%
+						}
 					}
 				}
 			%>

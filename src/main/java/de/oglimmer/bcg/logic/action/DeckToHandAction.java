@@ -22,7 +22,7 @@ import de.oglimmer.bcg.logic.Player;
  */
 public class DeckToHandAction extends AbstractAction implements Action {
 
-	private void sendDeckOwner(Player player, ClientChannel cc, CardList cards,
+	private void sendDeckOwner(Player player, ClientChannel cc, CardDeck cards,
 			Card card, Game game) {
 
 		List<Object[]> msg = new ArrayList<>();
@@ -32,7 +32,7 @@ public class DeckToHandAction extends AbstractAction implements Action {
 		cardJSON.element("areaId", "hand");
 		cardJSON.element("moveable", true);
 		player.processMessage(cardJSON, "You took " + card.getName() + " from "
-				+ cards.getName() + " into the hand");
+				+ cards.getDescription() + " into the hand");
 		msg.add(new Object[] { "createCard", cardJSON });
 
 		checkDeckMinus(player, cards, msg);
@@ -47,13 +47,13 @@ public class DeckToHandAction extends AbstractAction implements Action {
 		if (cards.isOpenCardList()) {
 			checkDeckMinus(otherPlayer, cards, msg);
 			txt = "Opponent took " + (oldFaceup ? card.getName() : "a card")
-					+ " from " + cards.getName() + " into the hand";
+					+ " from " + cards.getDescription() + " into the hand";
 		} else {
-			txt = "Opponent took a card from " + cards.getName()
+			txt = "Opponent took a card from " + cards.getDescription()
 					+ " into the hand";
 		}
 
-		addMessage(game, otherPlayer, cc, msg, txt);
+		addMessage(otherPlayer, cc, msg, txt);
 
 		addInfoText(player, msg);
 
@@ -68,7 +68,7 @@ public class DeckToHandAction extends AbstractAction implements Action {
 
 		CardDeck cards = (CardDeck) player.getCardListById(deckId);
 		Card card = cards.getCards().remove(0);
-		player.getCardStacks().get("hand").getCards().add(card);
+		player.getCardStacks().get(CardList.LISTNAME_HAND).getCards().add(card);
 
 		boolean oldFaceup = card.isFaceup();
 		card.setFaceup(true);

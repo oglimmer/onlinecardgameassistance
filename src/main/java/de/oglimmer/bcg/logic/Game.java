@@ -26,7 +26,8 @@ public class Game {
 
 	public void createBoard() {
 		if (board == null) {
-			this.board = gameConfig.getBoardFactory().createBoard(gameConfig, this);
+			this.board = gameConfig.getBoardFactory().createBoard(gameConfig,
+					this);
 		}
 	}
 
@@ -58,4 +59,11 @@ public class Game {
 		this.lastAccess = lastAccess;
 	}
 
+	public String getType() {
+		return gameConfig.getType();
+	}
+
+	public GameConfig getGameConfig() {
+		return gameConfig;
+	}
 }

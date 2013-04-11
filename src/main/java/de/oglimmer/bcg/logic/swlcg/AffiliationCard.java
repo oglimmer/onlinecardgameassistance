@@ -3,12 +3,12 @@ package de.oglimmer.bcg.logic.swlcg;
 import java.util.Collection;
 
 import net.sf.json.JSONObject;
-import de.oglimmer.bcg.logic.CardList;
+import de.oglimmer.bcg.logic.CardDeck;
 import de.oglimmer.bcg.logic.Player;
 
-public class AffiliationCard extends SwlcgCard {
+public class AffiliationCard extends SwlcgObjectiveCard {
 
-	public AffiliationCard(Player owner, CardList cl, String name,
+	public AffiliationCard(Player owner, CardDeck cl, String name,
 			String imageUrl, String backImageUrl) {
 		super(owner, cl, "Affilication", imageUrl, backImageUrl);
 	}

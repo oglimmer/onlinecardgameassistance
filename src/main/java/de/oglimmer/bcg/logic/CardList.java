@@ -7,7 +7,8 @@ import de.oglimmer.bcg.util.RandomString;
 
 public class CardList {
 
-	// private static final Logger log = LoggerFactory.getLogger(Cards.class);
+	public static final String LISTNAME_TABLE = "table";
+	public static final String LISTNAME_HAND = "hand";
 
 	private String id;
 	private String name;
@@ -18,16 +19,16 @@ public class CardList {
 		this.name = name;
 	}
 
+	public String getId() {
+		return id;
+	}
+
 	public String getName() {
 		return name;
 	}
 
 	public List<Card> getCards() {
 		return cards;
-	}
-
-	public String getId() {
-		return id;
 	}
 
 }

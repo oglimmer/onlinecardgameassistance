@@ -7,6 +7,7 @@ import net.sf.json.JSONObject;
 import de.oglimmer.bcg.com.ClientChannel;
 import de.oglimmer.bcg.logic.Card;
 import de.oglimmer.bcg.logic.CardDeck;
+import de.oglimmer.bcg.logic.CardList;
 import de.oglimmer.bcg.logic.Game;
 import de.oglimmer.bcg.logic.JSONPayload;
 import de.oglimmer.bcg.logic.Player;
@@ -42,7 +43,7 @@ public class DeckToTableAction extends AbstractAction implements Action {
 			boolean faceUp, CardDeck cards, Card card) {
 		String txt = "Opponent played " + (faceUp ? card.getName() : "a card")
 				+ " face " + (faceUp ? "up" : "down") + " from "
-				+ cards.getName() + " directly to the table";
+				+ cards.getDescription() + " directly to the table";
 		send(card, game, game.getPlayers().getOther(player), cc, txt, false,
 				cards);
 	}
@@ -51,7 +52,7 @@ public class DeckToTableAction extends AbstractAction implements Action {
 			boolean faceUp, CardDeck cards, Card card) {
 		String txt = "You played " + (faceUp ? card.getName() : "a card")
 				+ " face " + (faceUp ? "up" : "down") + " from "
-				+ cards.getName() + " directly to the table";
+				+ cards.getDescription() + " directly to the table";
 		send(card, game, player, cc, txt, true, cards);
 	}
 
@@ -64,7 +65,8 @@ public class DeckToTableAction extends AbstractAction implements Action {
 		CardDeck cards = (CardDeck) player.getCardListById(deckId);
 
 		Card card = cards.getCards().remove(0);
-		player.getCardStacks().get("table").getCards().add(card);
+		player.getCardStacks().get(CardList.LISTNAME_TABLE).getCards()
+				.add(card);
 		card.setFaceup(faceUp);
 
 		sendOwner(game, player, cc, faceUp, cards, card);

@@ -8,6 +8,7 @@ public abstract class CardDeck extends CardList implements JSONTransformable,
 
 	// private static final Logger log = LoggerFactory.getLogger(Cards.class);
 
+	protected String description;
 	protected int x;
 	protected int y;
 	protected Player owner;
@@ -16,9 +17,10 @@ public abstract class CardDeck extends CardList implements JSONTransformable,
 	protected int[] zIndexBorders = new int[] { Card.DEFAULT_ZINDEX,
 			Card.DEFAULT_ZINDEX };
 
-	public CardDeck(String name, Player owner, int x, int y,
-			boolean openCardList, String emptyImageUrl) {
+	public CardDeck(String name, String description, Player owner, int x,
+			int y, boolean openCardList, String emptyImageUrl) {
 		super(name);
+		this.description = description;
 		this.x = x;
 		this.y = y;
 		this.owner = owner;
@@ -46,6 +48,10 @@ public abstract class CardDeck extends CardList implements JSONTransformable,
 	@Override
 	public void setY(int yPos) {
 		this.y = yPos;
+	}
+
+	public String getDescription() {
+		return description;
 	}
 
 	@Override

@@ -32,7 +32,7 @@
 				}
 				emails += ")";
 		%>
-			<option value="<%=g.getId()%>"><%= g.getName()+" / "+df.format(g.getCreated())+" / "+df.format(g.getLastAccess())+" / "+emails%></option>
+			<option value="<%=g.getId()%>"><%= g.getName()+" / "+g.getType()+" / "+df.format(g.getCreated())+" / "+df.format(g.getLastAccess())+" / "+emails%></option>
 		<% } %>
 		</select>
 		<button onclick="document.location.href='adminDel.htm?pass=<%=request.getParameter("pass") %>&gameId='+document.getElementById('gameListOpen').value;">Del game</button>
@@ -50,7 +50,7 @@
 				}
 				emails += ")";
 		%>
-			<option value="<%=g.getId()%>"><%= g.getName()+" / "+df.format(g.getCreated())+" / "+df.format(g.getLastAccess())+" / "+g.getPlayers().getCurrentlyConnectec()+" / "+emails%></option>
+			<option value="<%=g.getId()%>"><%= g.getName()+" / "+g.getType()+" / "+df.format(g.getCreated())+" / "+df.format(g.getLastAccess())+" / "+g.getPlayers().getCurrentlyConnectec()+" / "+emails%></option>
 		<% } %>
 		</select>
 		<button onclick="document.location.href='adminDel.htm?pass=<%=request.getParameter("pass") %>&gameId='+document.getElementById('gameListRunning').value;">Del game</button>

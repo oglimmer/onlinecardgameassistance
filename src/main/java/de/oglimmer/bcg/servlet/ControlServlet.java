@@ -44,10 +44,13 @@ public class ControlServlet extends HttpServlet {
 		} else {
 			String path = getRequestPageName(req);
 			if ("start".equals(path)) {
-				reloadDeckList(req);
+				String gametype = req.getParameter("gametype");
+				ServletUtil.loadDeckList(gametype, req);
 				jspPage = "start.jsp";
 			} else if ("join".equals(path)) {
-				reloadDeckList(req);
+				String gametype = GameManager.INSTANCE.getGame(
+						req.getParameter("gameId")).getType();
+				ServletUtil.loadDeckList(gametype, req);
 				jspPage = "join.jsp";
 			} else if ("prepare".equals(path)) {
 				prepareCommand(req, resp);
@@ -137,16 +140,8 @@ public class ControlServlet extends HttpServlet {
 
 	private void setAdditionalSessionData(Document doc, HttpSession session)
 			throws IOException {
-		session.setAttribute("deckList", doc.get("deckList"));
 		session.setAttribute("permissionStartGame",
 				Authentication.INSTANCE.checkForAuthorizedUser(doc));
-	}
-
-	private void reloadDeckList(HttpServletRequest req) throws IOException {
-		Document doc = ServletUtil.getDocFromSession(req);
-		if (doc != null) {
-			setAdditionalSessionData(doc, req.getSession());
-		}
 	}
 
 	private void prepareCommand(HttpServletRequest req, HttpServletResponse resp)

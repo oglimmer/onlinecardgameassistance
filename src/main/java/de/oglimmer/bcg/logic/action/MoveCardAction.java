@@ -2,6 +2,7 @@ package de.oglimmer.bcg.logic.action;
 
 import net.sf.json.JSONObject;
 import de.oglimmer.bcg.com.ClientChannel;
+import de.oglimmer.bcg.logic.CardDeck;
 import de.oglimmer.bcg.logic.CardList;
 import de.oglimmer.bcg.logic.Game;
 import de.oglimmer.bcg.logic.Player;
@@ -33,8 +34,9 @@ public class MoveCardAction extends AbstractAction implements Action {
 		uiEle.setY(yPos);
 
 		Player otherPlayer = game.getPlayers().getOther(player);
-		if (uiEle instanceof CardList
-				|| player.getCardListByCardId(id).getName().equals("table")) {
+		if (uiEle instanceof CardDeck
+				|| player.getCardListByCardId(id).getName()
+						.equals(CardList.LISTNAME_TABLE)) {
 			send(cc, id, otherPlayer, xPos, yPos);
 		}
 	}
