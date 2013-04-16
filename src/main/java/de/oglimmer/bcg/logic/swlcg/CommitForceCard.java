@@ -8,7 +8,8 @@ import de.oglimmer.bcg.logic.Player;
 class CommitForceCard extends SwlcgObjectiveCard {
 
 	public CommitForceCard(Player player, String imageUrl) {
-		super(player, null, "Committed to the Force card", imageUrl, imageUrl);
+		super(player, null, "Committed to the Force card", imageUrl, imageUrl,
+				null);
 	}
 
 	@Override

@@ -2,6 +2,7 @@ package de.oglimmer.bcg.logic;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
 import net.sf.json.JSONObject;
 import de.oglimmer.bcg.util.JSONTransformable;
@@ -25,9 +26,11 @@ public abstract class Card implements JSONTransformable, UIElement {
 	protected CardDeck origin;
 	protected boolean highlight;
 	protected int zIndex = DEFAULT_ZINDEX;
+	protected Map<String, String> prop;
+	protected int grade;
 
 	public Card(Player owner, CardDeck origin, String name, String imageUrl,
-			String backImageUrl) {
+			String backImageUrl, Map<String, String> prop) {
 		this.id = RandomString.getRandomStringASCII(8);
 		this.origin = origin;
 		this.name = name;
@@ -36,6 +39,7 @@ public abstract class Card implements JSONTransformable, UIElement {
 		this.owner = owner;
 		this.x = 200;
 		this.y = 20;
+		this.prop = prop;
 	}
 
 	public String getId() {
@@ -108,11 +112,21 @@ public abstract class Card implements JSONTransformable, UIElement {
 		return name;
 	}
 
+	public Map<String, String> getProps() {
+		return prop;
+	}
+
+	public void setGrade(int grade) {
+		this.grade = grade;
+	}
+
+	public int getGrade() {
+		return grade;
+	}
+
 	@Override
 	public JSONObject toJSON(Player player, JSONPayload... payload) {
-		if (payload.length == 0) {
-			throw new GameException("toJson without payload makes no sense");
-		}
+		assert payload.length > 0 : "toJson without payload makes no sense";
 		JSONObject card = new JSONObject();
 		card.element("id", getId());
 		if (JSONPayload.BASE.in(payload)) {
@@ -124,7 +138,14 @@ public abstract class Card implements JSONTransformable, UIElement {
 		if (JSONPayload.HIGHLIGHT.in(payload)) {
 			handleJSONPayloadHighlight(card);
 		}
+		if (JSONPayload.GRADE.in(payload)) {
+			handleJSONPayloadGrade(card);
+		}
 		return card;
+	}
+
+	protected void handleJSONPayloadGrade(JSONObject card) {
+		card.element("grade", grade);
 	}
 
 	protected void handleJSONPayloadHighlight(JSONObject card) {

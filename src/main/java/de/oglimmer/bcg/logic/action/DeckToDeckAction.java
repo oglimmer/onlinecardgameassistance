@@ -51,10 +51,8 @@ public class DeckToDeckAction extends AbstractAction {
 				+ location + " of the " + targetDeck.getDescription(), true);
 	}
 
-	private void returnToTargetDeck(CardDeck sourceDeck, CardDeck targetDeck,
+	private void returnToTargetDeck(Card card, CardDeck targetDeck,
 			String location, Player player) {
-
-		Card card = sourceDeck.getCards().remove(0);
 
 		if ("top".equals(location)) {
 			targetDeck.getCards().add(0, card);
@@ -79,13 +77,29 @@ public class DeckToDeckAction extends AbstractAction {
 		CardDeck targetDeck = (CardDeck) player.getCardStacks().get(
 				targetDeckName);
 
+		moveCardToDeck(game, player, cc, sourceDeck, targetDeck, location);
+	}
+
+	public void moveCardToDeck(Game game, Player player, ClientChannel cc,
+			CardDeck sourceDeck, CardDeck targetDeck, String location) {
 		if ("all".equals(location)) {
 			while (!sourceDeck.getCards().isEmpty()) {
-				returnToTargetDeck(sourceDeck, targetDeck, "bottom", player);
+				Card card = sourceDeck.getCards().remove(0);
+				returnToTargetDeck(card, targetDeck, "bottom", player);
 			}
 		} else {
-			returnToTargetDeck(sourceDeck, targetDeck, location, player);
+			Card card = sourceDeck.getCards().remove(0);
+			returnToTargetDeck(card, targetDeck, location, player);
 		}
+
+		sendOwner(player, cc, location, sourceDeck, targetDeck);
+		sendOpponent(game, player, cc, location, sourceDeck, targetDeck);
+	}
+
+	public void moveCardToDeck(Game game, Player player, ClientChannel cc,
+			Card card, CardDeck sourceDeck, CardDeck targetDeck, String location) {
+
+		returnToTargetDeck(card, targetDeck, location, player);
 
 		sendOwner(player, cc, location, sourceDeck, targetDeck);
 		sendOpponent(game, player, cc, location, sourceDeck, targetDeck);

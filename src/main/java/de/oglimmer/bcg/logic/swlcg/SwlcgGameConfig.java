@@ -23,7 +23,6 @@ import com.fourspaces.couchdb.Document;
 import de.oglimmer.bcg.logic.BoardArea;
 import de.oglimmer.bcg.logic.CardDeck;
 import de.oglimmer.bcg.logic.CardsSet;
-import de.oglimmer.bcg.logic.Game;
 import de.oglimmer.bcg.logic.GameException;
 import de.oglimmer.bcg.logic.GameManager;
 import de.oglimmer.bcg.logic.Player;
@@ -33,7 +32,9 @@ import de.oglimmer.bcg.logic.config.BoardFactory;
 import de.oglimmer.bcg.logic.config.CardsFactory;
 import de.oglimmer.bcg.logic.config.DefaultBoardFactory;
 import de.oglimmer.bcg.logic.config.GameConfig;
+import de.oglimmer.bcg.logic.config.SearchCategory;
 import de.oglimmer.bcg.servlet.ServletUtil;
+import de.oglimmer.bcg.util.JSONArrayList;
 
 public class SwlcgGameConfig implements GameConfig {
 
@@ -43,11 +44,11 @@ public class SwlcgGameConfig implements GameConfig {
 			.getLogger(SwlcgGameConfig.class);
 
 	private InfoBoxUpdater infoBoxUpdater = new SwlcgInfoBoxUpdater();
+	private CardsFactory cardsFactory = new SwlcgCardsFactory();
 
 	@Override
-	public CardsFactory getCardsFactory(Game game, Player player,
-			InputStream deckStream) {
-		return new SwlcgCardsFactory(game, player, deckStream);
+	public synchronized CardsFactory getCardsFactory() {
+		return cardsFactory;
 	}
 
 	@Override
@@ -132,6 +133,11 @@ public class SwlcgGameConfig implements GameConfig {
 	@Override
 	public InfoBoxUpdater getInfoBoxUpdater() {
 		return infoBoxUpdater;
+	}
+
+	@Override
+	public JSONArrayList<SearchCategory> getSearchCategories() {
+		return null;
 	}
 
 }

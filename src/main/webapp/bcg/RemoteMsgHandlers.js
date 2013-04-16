@@ -1,7 +1,7 @@
 define([ "dojo/dom", "dojo/fx", "dojo/dom-construct", "dojox/css3/fx",
 				"bcg/Moveable", "dojo/_base/declare", "dojo/_base/array", "dojo/on", 
-				"dojo/query", "./MenuHandler", "dojo/window" ], 
-function(dom, fx, domConstruct, cssFx, Moveable, declare, arrayUtil, on, query, MenuHandler, win) {
+				"dojo/query", "./MenuHandler", "dojo/window", "./SearchDialog" ], 
+function(dom, fx, domConstruct, cssFx, Moveable, declare, arrayUtil, on, query, MenuHandler, win, SearchDialog) {
 	
 return declare(null, {
 	
@@ -9,10 +9,12 @@ return declare(null, {
 	idFromMessages:null,
 	menuHandler:null,
 	imageBasePath:null,
+	searchDialog:null,
 	
 	constructor: function(remoteMsgSender) {
 		this.remoteMsgSender = remoteMsgSender;
 		this.menuHandler = new MenuHandler(remoteMsgSender);
+		this.searchDialog = new SearchDialog(remoteMsgSender);
 	},
 	
 	/* ---- handler ---- */
@@ -25,6 +27,7 @@ return declare(null, {
 	initHandler: function(v) {
 		this._setBorders(v);
 		this.imageBasePath = v.imageBasePath;
+		this.searchDialog.imageBasePath = v.imageBasePath;
 		// if the "tableArea" is already populated, don't send init-action again		
 		if(dom.byId("tableArea").innerHTML == "") {
 			this.remoteMsgSender.sendInitMsg();
@@ -33,6 +36,18 @@ return declare(null, {
 				self.remoteMsgSender.sendPreInitMsg();
 			}));
 		}
+	},
+	
+	searchStartHandler: function(v) {
+		this.searchDialog.showDialog(v);
+		this.messageHandler(v);
+		this.infoHandler(v);					
+	},
+	
+	searchResultHandler: function(v) {
+		this.searchDialog.addResult(v);
+		this.messageHandler(v);
+		this.infoHandler(v);					
 	},
 	
 	changeZIndexHandler: function(v) {
@@ -100,22 +115,23 @@ return declare(null, {
 	
 	/* answer from RotateCard for your and opponents cards*/
 	rotateCardHandler : function(v) {
-		var node = dom.byId(v.cardId);
+		var node = dom.byId(v.id);
+		var dura = typeof(v.imageUrl) ==='undefined'?100:1;
 		if(node.bcgRotated=="1") {
 			node.bcgRotated="0";
 			cssFx.rotate({
 				node : node,
-				startAngle : "90deg",
+				startAngle : v.grade+"deg",
 				endAngle : "0deg",
-				duration: 100
+				duration: dura
 			}).play();
 		} else {
 			node.bcgRotated="1";
 			cssFx.rotate({
 				node : node,
 				startAngle : "0deg",
-				endAngle : "90deg",
-				duration: 100
+				endAngle : v.grade+"deg",
+				duration: dura
 			}).play();
 		}
 		this.messageHandler(v);
@@ -258,7 +274,11 @@ return declare(null, {
 		
 		this._createCardZoom(card, v);
 		
-		this.menuHandler.addMenu(card, v.menu);
+		this.menuHandler.addMenu(v, v.menu);
+		
+		if(v.grade > 0) {
+			this.rotateCardHandler(v);
+		}
 		
 		if(v.moveable) {	
 			new Moveable(card, {}, v, this.remoteMsgSender.sendMoveCardMsg.bind(this.remoteMsgSender));

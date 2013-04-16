@@ -1,6 +1,7 @@
 package de.oglimmer.bcg.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import net.sf.json.JSONArray;
 import de.oglimmer.bcg.logic.JSONPayload;
@@ -17,6 +18,14 @@ import de.oglimmer.bcg.logic.Player;
 @SuppressWarnings("serial")
 public class JSONArrayList<E> extends ArrayList<E> {
 
+	public JSONArrayList() {
+		super();
+	}
+
+	public JSONArrayList(Collection<? extends E> c) {
+		super(c);
+	}
+
 	public JSONArray toJsonArray(Player player) {
 		return toJsonArray(player, null);
 	}
@@ -29,6 +38,10 @@ public class JSONArrayList<E> extends ArrayList<E> {
 				JSONTransformable json = (JSONTransformable) element;
 				if (check == null || check.isItemOkay(json)) {
 					arr.add(json.toJSON(player, JSONPayload.BASE));
+				}
+			} else if (element instanceof String) {
+				if (check == null || check.isItemOkay(element)) {
+					arr.add(element);
 				}
 			}
 		}

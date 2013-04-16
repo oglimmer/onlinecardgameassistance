@@ -1,6 +1,7 @@
 package de.oglimmer.bcg.logic.swlcg;
 
 import java.util.Collection;
+import java.util.Map;
 
 import net.sf.json.JSONObject;
 import de.oglimmer.bcg.logic.Card;
@@ -11,8 +12,8 @@ import de.oglimmer.bcg.logic.Player;
 public class SwlcgObjectiveCard extends Card {
 
 	public SwlcgObjectiveCard(Player owner, CardDeck origin, String name,
-			String imageUrl, String backImageUrl) {
-		super(owner, origin, name, imageUrl, backImageUrl);
+			String imageUrl, String backImageUrl, Map<String, String> prop) {
+		super(owner, origin, name, imageUrl, backImageUrl, prop);
 	}
 
 	protected void addMenu(Player player, JSONObject card,
@@ -48,7 +49,7 @@ public class SwlcgObjectiveCard extends Card {
 				if (!menu.isEmpty()) {
 					menu.add("-");
 				}
-				menu.add("Rotate card:rotateCard");
+				menu.add("Rotate card:rotateCard:90");
 				menu.add("-");
 				menu.add("Put card on top of " + origin.getDescription()
 						+ ":returnToDeck:origin_top");

@@ -31,8 +31,8 @@ public class Player implements JSONTransformable {
 		this.key = key;
 		this.game = game;
 		this.side = side;
-		cardsSet = gameConfig.getCardsFactory(game, this, deckStream)
-				.createCardsSet();
+		cardsSet = gameConfig.getCardsFactory()
+				.createCardsSet(this, deckStream);
 	}
 
 	public Game getGame() {

@@ -66,3 +66,22 @@ ul {
 	top: 0px;
 	z-index: 3;
 }
+
+#searchDialog {
+	display: none;
+	position: absolute;
+	left: 200px;
+	top: 50px;
+	width: 550px;
+	height: 500px;
+	border: 5px solid white;
+	background-color: black;
+	color: white;
+	z-index: 100000;
+}
+
+#searchResult {
+	overflow: auto;
+	width:549px;
+	height:476px;
+}

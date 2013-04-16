@@ -32,6 +32,8 @@ public abstract class AbstractAction implements Action {
 		}
 	}
 
+	// --------------------------------------------------
+
 	protected void addInfoText(final Player otherPlayer, List<Object[]> msg) {
 		JSONObject cardJSON = new JSONObject();
 		addInfoText(otherPlayer, cardJSON);
@@ -42,6 +44,8 @@ public abstract class AbstractAction implements Action {
 		otherPlayer.getGame().getGameConfig().getInfoBoxUpdater()
 				.addInfoText(otherPlayer, cardJSON);
 	}
+
+	// --------------------------------------------------
 
 	protected void sendMessage(Player player, ClientChannel cc, String text) {
 
@@ -57,6 +61,8 @@ public abstract class AbstractAction implements Action {
 		player.processMessage(cardJSON, text);
 		msg.add(new Object[] { "message", cardJSON });
 	}
+
+	// --------------------------------------------------
 
 	protected void send(Player player, ClientChannel cc, String handlerName,
 			Object data) {

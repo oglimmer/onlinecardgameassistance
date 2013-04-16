@@ -1,22 +1,23 @@
 package de.oglimmer.bcg.logic.swccg;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.Collection;
 
 import javax.servlet.http.HttpServletRequest;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+
+import com.fourspaces.couchdb.Database;
+import com.fourspaces.couchdb.Document;
+
 import de.oglimmer.bcg.logic.BoardArea;
 import de.oglimmer.bcg.logic.CardDeck;
 import de.oglimmer.bcg.logic.CardsSet;
-import de.oglimmer.bcg.logic.Game;
+import de.oglimmer.bcg.logic.GameException;
 import de.oglimmer.bcg.logic.GameManager;
 import de.oglimmer.bcg.logic.Player;
 import de.oglimmer.bcg.logic.Side;
@@ -24,27 +25,47 @@ import de.oglimmer.bcg.logic.action.InfoBoxUpdater;
 import de.oglimmer.bcg.logic.config.CardsFactory;
 import de.oglimmer.bcg.logic.config.DefaultBoardFactory;
 import de.oglimmer.bcg.logic.config.GameConfig;
+import de.oglimmer.bcg.logic.config.SearchCategory;
 import de.oglimmer.bcg.servlet.ServletUtil;
+import de.oglimmer.bcg.util.JSONArrayList;
 
 public class SwccgGameConfig implements GameConfig {
 
-	private BoardFactory bf = new BoardFactory();
+	private BoardFactory baordFactory = new BoardFactory();
+	private CardsFactory cardsFactory = new SwccgCardsFactory();
 	private SwccgInfoBoxUpdater infoBoxUpdater = new SwccgInfoBoxUpdater();
 
+	public SwccgGameConfig() {
+	}
+
 	@Override
-	public CardsFactory getCardsFactory(Game game, Player player,
-			InputStream deckStream) {
-		return new SwccgCardsFactory(game, player, deckStream);
+	public CardsFactory getCardsFactory() {
+		return cardsFactory;
 	}
 
 	@Override
 	public BoardFactory getBoardFactory() {
-		return bf;
+		return baordFactory;
 	}
 
 	@Override
 	public String getType() {
 		return "swccg";
+	}
+
+	public JSONArrayList<SearchCategory> getSearchCategories() {
+		JSONArrayList<SearchCategory> searchCategories = new JSONArrayList<>();
+		searchCategories.add(new SearchCategory("Name", "TEXT"));
+		searchCategories.add(new SearchCategory("Set", "LIST"));
+		searchCategories.add(new SearchCategory("Category", "LIST"));
+		searchCategories.add(new SearchCategory("Destiny", "TEXT"));
+		searchCategories.add(new SearchCategory("Restrictions", "TEXT"));
+		searchCategories.add(new SearchCategory("Stats", "TEXT"));
+		searchCategories.add(new SearchCategory("Deploy", "TEXT"));
+		searchCategories.add(new SearchCategory("Forfeit", "TEXT"));
+		searchCategories.add(new SearchCategory("Icons", "TEXT"));
+		searchCategories.add(new SearchCategory("Text", "TEXT"));
+		return searchCategories;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -70,30 +91,13 @@ public class SwccgGameConfig implements GameConfig {
 	@Override
 	public InputStream getDeckStream(String deckId) throws IOException,
 			MalformedURLException {
-		// Database db = ServletUtil.getDatabase();
-		// Document doc = db.getDocument(deckId);
-		// if (doc == null) {
-		// throw new GameException("no deck with id=" + deckId);
-		// }
-
-		URL url = new URL("file:///Users/oli/Desktop/" + deckId);
-		URLConnection con = url.openConnection();
-		con.setUseCaches(false);
-		return copyContentAsBufferedInputStream(con);
-	}
-
-	private InputStream copyContentAsBufferedInputStream(URLConnection con)
-			throws IOException {
-		ByteArrayOutputStream baos;
-		try (InputStream is = con.getInputStream()) {
-			byte[] buff = new byte[2048];
-			int len = 0;
-			baos = new ByteArrayOutputStream(2048);
-			while ((len = is.read(buff)) > -1) {
-				baos.write(buff, 0, len);
-			}
+		Database db = ServletUtil.getDatabase();
+		Document doc = db.getDocument(deckId);
+		if (doc == null) {
+			throw new GameException("no deck with id=" + deckId);
 		}
-		return new ByteArrayInputStream(baos.toByteArray());
+
+		return new ByteArrayInputStream(doc.getString("blocks").getBytes());
 	}
 
 	@Override

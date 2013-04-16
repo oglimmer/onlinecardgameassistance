@@ -89,6 +89,7 @@ public class ReturnToDeckAction extends AbstractAction implements Action {
 
 		CardDeck targetDeck = (CardDeck) ("origin".equals(deckName) ? card
 				.getOrigin() : player.getCardStacks().get(deckName));
+		assert targetDeck != null : deckName + " not found";
 
 		if ("top".equals(location)) {
 			targetDeck.getCards().add(0, card);

@@ -17,6 +17,8 @@ return declare(null, {
 	    });
 		pMenu.attachedCardId = nodeId;
 		this.menuToNodeMapping[nodeId] = pMenu;
+		console.log("nodeId="+nodeId);
+		console.log(entries);
 		arrayUtil.forEach(entries, function(item, index) {
 			if(item.type==0) {
 				pMenu.addChild(new MenuSeparator());
@@ -67,7 +69,7 @@ return declare(null, {
 		}
 	},
 
-	addMenu: function(cardDiv, menu) {
+	addMenu: function(cardData, menu) {
 		if(typeof(menu) == "undefined") {
 			return;
 		}
@@ -75,6 +77,7 @@ return declare(null, {
 		var menuData = new Array();
 		arrayUtil.forEach(menu, function(item, index) {
 			// item looks like "label:actionName:[param]"
+			var cardDataData = cardData;
 			var splits = item.split(":");			
 			var name = splits[0];
 			if(name.charAt(0)=="~") {
@@ -86,20 +89,20 @@ return declare(null, {
 			} else {
 				// menu entry with remote action
 				if(typeof(splits[2]) != 'undefined') {
-					cardDiv = lang.clone(cardDiv);
-					lang.mixin(cardDiv, { "param": splits[2] });
+					cardDataData = lang.clone(cardDataData);
+					lang.mixin(cardDataData, { "param": splits[2] });
 				}
 				menuData.push({
 					type: 2,
 					label : name,
 					fnct : self.remoteMsgSender.send.bind(self.remoteMsgSender),
 					actionName : splits[1],
-					params: cardDiv
+					params: cardDataData
 				});
 			}
 		});
 		if(menuData.length>0) {
-			this.createMenu(cardDiv.id, menuData);
+			this.createMenu(cardData.id, menuData);
 		}
 	}	
 	

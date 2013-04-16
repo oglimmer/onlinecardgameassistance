@@ -9,7 +9,7 @@ public class DeathStarDialCard extends SwlcgObjectiveCard {
 
 	public DeathStarDialCard() {
 		super(null, null, "Death Star Dial Card", "death-star-dial.png",
-				"death-star-dial.png");
+				"death-star-dial.png", null);
 	}
 
 	@Override

@@ -65,6 +65,11 @@ public class DeckToTableAction extends AbstractAction implements Action {
 		CardDeck cards = (CardDeck) player.getCardListById(deckId);
 
 		Card card = cards.getCards().remove(0);
+		moveCardToTable(game, player, cc, cards, card, faceUp);
+	}
+
+	public void moveCardToTable(Game game, Player player, ClientChannel cc,
+			CardDeck cards, Card card, boolean faceUp) {
 		player.getCardStacks().get(CardList.LISTNAME_TABLE).getCards()
 				.add(card);
 		card.setFaceup(faceUp);
@@ -72,5 +77,6 @@ public class DeckToTableAction extends AbstractAction implements Action {
 		sendOwner(game, player, cc, faceUp, cards, card);
 
 		sendOpponent(game, player, cc, faceUp, cards, card);
+
 	}
 }

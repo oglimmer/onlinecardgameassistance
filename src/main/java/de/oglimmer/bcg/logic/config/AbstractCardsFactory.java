@@ -1,30 +1,17 @@
 package de.oglimmer.bcg.logic.config;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 import de.oglimmer.bcg.logic.Card;
 import de.oglimmer.bcg.logic.CardDeck;
 import de.oglimmer.bcg.logic.CardList;
-import de.oglimmer.bcg.logic.Game;
-import de.oglimmer.bcg.logic.GameException;
 import de.oglimmer.bcg.logic.Player;
 
 public abstract class AbstractCardsFactory {
@@ -32,37 +19,36 @@ public abstract class AbstractCardsFactory {
 	private static final Logger log = LoggerFactory
 			.getLogger(AbstractCardsFactory.class);
 
-	private static Map<String, String[]> idCardDataCache = new HashMap<>();
+	protected class Data {
+		public Data(Player owner, InputStream deckStream,
+				String cardBackgroundUrl) {
+			this.owner = owner;
+			this.deckStream = deckStream;
+			this.cardBackgroundUrl = cardBackgroundUrl;
+			this.cards = new ArrayList<>();
+			this.playerNo = owner.getNo();
+		}
 
-	protected Game game;
-	protected Player owner;
-	protected List<CardList> cards;
-	protected String cardBackgroundUrl;
-	protected InputStream deckStream;
-	protected int playerNo;
-
-	public AbstractCardsFactory(Game game, Player owner,
-			InputStream deckStream, String cardBackgroundUrl) {
-		this.game = game;
-		this.owner = owner;
-		this.cards = new ArrayList<>();
-		this.deckStream = deckStream;
-		this.playerNo = owner.getNo();
-		this.cardBackgroundUrl = cardBackgroundUrl;
-		initIdCardDataCache();
+		public Player owner;
+		public InputStream deckStream;
+		public String cardBackgroundUrl;
+		public List<CardList> cards;
+		public int playerNo;
 	}
 
-	protected abstract String[] getRefFiles();
+	public AbstractCardsFactory() {
+	}
 
-	protected void addCards(CardList cardList, List<String[]> cardData,
-			Class<? extends Card> clazz) {
+	protected void addCards(CardList cardList, List<String[]> cardDataList,
+			Class<? extends Card> clazz, Data data) {
 		try {
-			for (String[] data : cardData) {
-				String imageUrl = data[0];
-				String cardName = data[1];
+			for (String[] cardData : cardDataList) {
+				String imageUrl = cardData[0];
+				String cardName = cardData[1];
 				Card card = clazz.getConstructor(Player.class, CardDeck.class,
-						String.class, String.class, String.class).newInstance(
-						owner, cardList, cardName, imageUrl, cardBackgroundUrl);
+						String.class, String.class, String.class, Map.class)
+						.newInstance(data.owner, cardList, cardName, imageUrl,
+								data.cardBackgroundUrl, null);
 				cardList.getCards().add(card);
 			}
 		} catch (InstantiationException | IllegalAccessException
@@ -72,117 +58,23 @@ public abstract class AbstractCardsFactory {
 		}
 	}
 
-	/**
-	 * XML helper
-	 * 
-	 * @param sectionName
-	 * @param doc
-	 * @return
-	 */
-	private Node getSection(String sectionName, Document doc) {
-		NodeList nl = doc.getElementsByTagName("section");
-		for (int i = 0; i < nl.getLength(); i++) {
-			Node n = nl.item(i);
-			if (n.getAttributes().getNamedItem("name").getNodeValue()
-					.equals(sectionName)) {
-				return n;
-			}
-		}
-		throw new GameException("couldn't find " + sectionName + " section");
-	}
-
-	protected String getCardnameFromFilename(String cardSetFileName,
-			String cardFileName) {
-		return cardFileName;
-	}
-
-	/**
-	 * Returns a list of imageUrls for a given deck aka section
-	 * 
-	 * @param section
-	 * @return
-	 * @throws ParserConfigurationException
-	 * @throws SAXException
-	 * @throws IOException
-	 */
-	protected List<String[]> getImageUrls(String section)
-			throws ParserConfigurationException, SAXException, IOException {
-
-		List<String[]> ret = new ArrayList<>();
-
-		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-
-		deckStream.reset();// we read more than once
-		Document deckDoc = dBuilder.parse(deckStream);
-		deckDoc.getDocumentElement().normalize();
-
-		Node node = getSection(section, deckDoc);
-		NodeList nl = node.getChildNodes();
-		for (int i = 0; i < nl.getLength(); i++) {
-			Node n = nl.item(i);
-			if (n.getNodeName().equals("card")) {
-				String qty = n.getAttributes().getNamedItem("qty")
-						.getNodeValue();
-				String idAsInDef = n.getAttributes().getNamedItem("id")
-						.getNodeValue();
-				String idAsInRef = "C" + idAsInDef.replace("-", "");
-				String[] data = idCardDataCache.get(idAsInRef);
-				for (int j = 0; j < Integer.parseInt(qty); j++) {
-					ret.add(data);
-				}
-			}
-		}
-
-		return ret;
-	}
-
-	/**
-	 * Reads XML and inits the Id->Filename/Cardname mapping
-	 * 
-	 * @return
-	 * @throws SAXException
-	 * @throws IOException
-	 * @throws ParserConfigurationException
-	 */
-	private synchronized void initIdCardDataCache() {
-
+	protected void addCards(int foo, CardList cardList,
+			List<Map<String, String>> cardDataList,
+			Class<? extends Card> clazz, Data data) {
 		try {
-			if (idCardDataCache.isEmpty()) {
-				DocumentBuilderFactory dbFactory = DocumentBuilderFactory
-						.newInstance();
-				DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-
-				for (String refFile : getRefFiles()) {
-					Document doc = dBuilder.parse(this.getClass()
-							.getResourceAsStream(refFile));
-					doc.getDocumentElement().normalize();
-
-					NodeList nl = doc.getElementsByTagName("Relationship");
-					for (int i = 0; i < nl.getLength(); i++) {
-						Node n = nl.item(i);
-						String fileName = n.getAttributes()
-								.getNamedItem("Target").getNodeValue();
-						if (fileName.startsWith("/cards/")) {
-							fileName = fileName.substring(7);
-						}
-
-						String cardName = getCardnameFromFilename(refFile,
-								fileName);
-
-						String cardId = n.getAttributes().getNamedItem("Id")
-								.getNodeValue();
-						log.debug(cardId + " => " + fileName + "~" + cardName);
-						idCardDataCache.put(cardId, new String[] { fileName,
-								cardName });
-					}
-				}
+			for (Map<String, String> cardData : cardDataList) {
+				String imageUrl = cardData.get("ImageFile");
+				String cardName = cardData.get("Name");
+				Card card = clazz.getConstructor(Player.class, CardDeck.class,
+						String.class, String.class, String.class, Map.class)
+						.newInstance(data.owner, cardList, cardName, imageUrl,
+								data.cardBackgroundUrl, cardData);
+				cardList.getCards().add(card);
 			}
-		} catch (DOMException | ParserConfigurationException | SAXException
-				| IOException e) {
-			throw new GameException("Failed to init idImageCache", e);
+		} catch (InstantiationException | IllegalAccessException
+				| IllegalArgumentException | InvocationTargetException
+				| NoSuchMethodException | SecurityException e) {
+			log.error("Failed to add a card", e);
 		}
-
 	}
-
 }

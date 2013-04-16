@@ -5,15 +5,13 @@ import java.io.InputStream;
 
 import javax.servlet.http.HttpServletRequest;
 
-import de.oglimmer.bcg.logic.Game;
-import de.oglimmer.bcg.logic.Player;
 import de.oglimmer.bcg.logic.Side;
 import de.oglimmer.bcg.logic.action.InfoBoxUpdater;
+import de.oglimmer.bcg.util.JSONArrayList;
 
 public interface GameConfig {
 
-	CardsFactory getCardsFactory(Game game, Player player,
-			InputStream deckStream);
+	CardsFactory getCardsFactory();
 
 	BoardFactory getBoardFactory();
 
@@ -25,4 +23,6 @@ public interface GameConfig {
 	InputStream getDeckStream(String deckId) throws IOException;
 
 	InfoBoxUpdater getInfoBoxUpdater();
+
+	JSONArrayList<SearchCategory> getSearchCategories();
 }

@@ -33,6 +33,7 @@ public enum CrossContextSession {
 	 */
 	public synchronized boolean retrieveSessionFromServletContext(
 			HttpServletRequest req) {
+		if(true) return false;
 		boolean loggedIn = false;
 		try {
 			HttpSession currentSession = req.getSession();
@@ -66,7 +67,7 @@ public enum CrossContextSession {
 	 * @param session
 	 */
 	public synchronized void saveSessionToServletContext(HttpServletRequest req) {
-
+		if(true) return;
 		HttpSession session = req.getSession();
 
 		WeakReference<HttpSession>[] ccs = getHttpSessions(req, session, true);
@@ -89,6 +90,7 @@ public enum CrossContextSession {
 	 * @param req
 	 */
 	public synchronized void invalidateAllSessions(HttpServletRequest req) {
+		if(true) return;
 		HttpSession session = req.getSession();
 		WeakReference<HttpSession>[] ccs = getHttpSessions(req, session, false);
 		if (ccs != null) {

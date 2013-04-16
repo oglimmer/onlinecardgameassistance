@@ -1,27 +1,37 @@
 package de.oglimmer.bcg.logic.config;
 
-import de.oglimmer.bcg.logic.GameException;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public enum GameConfigManager {
 	INSTANCE;
 
-	public GameConfig getGameConfig(String gametype) {
+	private final Logger log = LoggerFactory.getLogger(GameConfigManager.class);
+
+	private GameConfigManager() {
 		try {
-			String clazz;
-			switch (gametype) {
-			case "swlcg":
-				clazz = "de.oglimmer.bcg.logic.swlcg.SwlcgGameConfig";
-				break;
-			case "swccg":
-				clazz = "de.oglimmer.bcg.logic.swccg.SwccgGameConfig";
-				break;
-			default:
-				throw new GameException("No game with gametype=" + gametype);
-			}
-			return (GameConfig) Class.forName(clazz).newInstance();
+			instances.put(
+					"swlcg",
+					(GameConfig) Class.forName(
+							"de.oglimmer.bcg.logic.swlcg.SwlcgGameConfig")
+							.newInstance());
+			instances.put(
+					"swccg",
+					(GameConfig) Class.forName(
+							"de.oglimmer.bcg.logic.swccg.SwccgGameConfig")
+							.newInstance());
 		} catch (InstantiationException | IllegalAccessException
 				| ClassNotFoundException e) {
-			throw new GameException("No game with gametype=" + gametype, e);
+			log.error("Failed to init GameConfigManager", e);
 		}
+	}
+
+	private Map<String, GameConfig> instances = new HashMap<>();
+
+	public GameConfig getGameConfig(String gametype) {
+		return instances.get(gametype);
 	}
 }

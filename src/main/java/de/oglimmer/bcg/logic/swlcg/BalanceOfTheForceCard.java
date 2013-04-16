@@ -9,7 +9,7 @@ class BalanceOfTheForceCard extends SwlcgObjectiveCard {
 
 	public BalanceOfTheForceCard() {
 		super(null, null, "Balance of the Force Card", "balance_light.jpg",
-				"balance_dark.jpg");
+				"balance_dark.jpg", null);
 	}
 
 	@Override

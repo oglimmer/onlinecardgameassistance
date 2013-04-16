@@ -54,7 +54,7 @@ public class ActionMessage implements Runnable {
 	public void run() {
 		try {
 			action.execute(game, player, param, clientChannel);
-		} catch (RuntimeException e) {
+		} catch (RuntimeException | AssertionError e) {
 			log.error("Failed to run action " + action.getClass().getName(), e);
 		}
 	}

@@ -3,6 +3,8 @@ package de.oglimmer.bcg.logic;
 import java.util.Date;
 
 import de.oglimmer.bcg.logic.config.GameConfig;
+import de.oglimmer.bcg.logic.config.SearchCategory;
+import de.oglimmer.bcg.util.JSONArrayList;
 import de.oglimmer.bcg.util.RandomString;
 
 public class Game {
@@ -14,6 +16,7 @@ public class Game {
 	private Date created;
 	private Date lastAccess;
 	private GameConfig gameConfig;
+	private JSONArrayList<SearchCategory> searchCategories;
 
 	public Game(GameConfig gameConfig) {
 		this.id = RandomString.getRandomStringASCII(8);
@@ -22,6 +25,7 @@ public class Game {
 		this.created = new Date();
 		this.lastAccess = this.created;
 		this.gameConfig = gameConfig;
+		this.searchCategories = gameConfig.getSearchCategories();
 	}
 
 	public void createBoard() {
@@ -57,6 +61,10 @@ public class Game {
 
 	public void setLastAccess(Date lastAccess) {
 		this.lastAccess = lastAccess;
+	}
+
+	public JSONArrayList<SearchCategory> getSearchCategories() {
+		return searchCategories;
 	}
 
 	public String getType() {

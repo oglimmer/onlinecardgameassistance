@@ -9,7 +9,7 @@ define([ "dojo/_base/declare", "dojo/_base/lang", "dojo/window" ], function(decl
 		},
 		
 		send: function(actionName, v) {
-			if(actionName == "ping" || actionName == "moveCardMsg" || actionName == "initMsg" || actionName == "preInitMsg") {
+			if(actionName == "ping" || actionName == "moveCardMsg" || actionName == "initMsg" || actionName == "preInitMsg" || actionName == "search") {
 				throw "send must not be called for action="+actionName;
 			} else {
 				this.sendMsg(actionName, {
@@ -43,6 +43,14 @@ define([ "dojo/_base/declare", "dojo/_base/lang", "dojo/window" ], function(decl
 				browserHeight: vs.h
 			});			
 		},		
+		
+		search : function(v) {
+			this.sendMsg("searchDo", v);
+		},
+		
+		searchOperateOnResult : function(v) {
+			this.sendMsg("searchOperateOnResult", v);
+		},
 
 		sendMsg : function(actionId, additionalParams) {
 			var self = this;

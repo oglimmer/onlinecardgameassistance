@@ -16,7 +16,8 @@ public class InitAction extends AbstractAction implements Action {
 	private void createTableCards(Game game, Player player, List<Object[]> msg) {
 		for (Card card : player.getCardStacks().get("table").getCards()) {
 			JSONObject json = card.toJSON(player, JSONPayload.BASE,
-					JSONPayload.COUNTER, JSONPayload.HIGHLIGHT);
+					JSONPayload.COUNTER, JSONPayload.HIGHLIGHT,
+					JSONPayload.GRADE);
 			json.element("areaId", "table");
 			json.element("moveable", card.isOwner(player));
 			msg.add(new Object[] { "createCard", json });

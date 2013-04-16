@@ -31,6 +31,9 @@ public enum ActionFactory {
 		def.add(new RefreshAction());
 		def.add(new TableToHandAction());
 		def.add(new DeckToDeckAction());
+		def.add(new SearchStartAction());
+		def.add(new SearchDoAction());
+		def.add(new SearchOperateOnResultAction());
 	}
 
 	public Action getAction(String actionId) {

@@ -5,6 +5,12 @@ import de.oglimmer.bcg.com.ClientChannel;
 import de.oglimmer.bcg.logic.Game;
 import de.oglimmer.bcg.logic.Player;
 
+/**
+ * We use this for a keep-alive
+ * 
+ * @author oli
+ * 
+ */
 public class PingAction extends AbstractAction implements Action {
 
 	@Override

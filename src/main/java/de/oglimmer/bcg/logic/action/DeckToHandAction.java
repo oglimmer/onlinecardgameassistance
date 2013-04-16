@@ -68,6 +68,11 @@ public class DeckToHandAction extends AbstractAction implements Action {
 
 		CardDeck cards = (CardDeck) player.getCardListById(deckId);
 		Card card = cards.getCards().remove(0);
+		moveCardToHand(game, player, cc, cards, card);
+	}
+
+	public void moveCardToHand(Game game, Player player, ClientChannel cc,
+			CardDeck cards, Card card) {
 		player.getCardStacks().get(CardList.LISTNAME_HAND).getCards().add(card);
 
 		boolean oldFaceup = card.isFaceup();

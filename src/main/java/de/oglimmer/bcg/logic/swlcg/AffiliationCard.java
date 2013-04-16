@@ -1,6 +1,7 @@
 package de.oglimmer.bcg.logic.swlcg;
 
 import java.util.Collection;
+import java.util.Map;
 
 import net.sf.json.JSONObject;
 import de.oglimmer.bcg.logic.CardDeck;
@@ -9,8 +10,8 @@ import de.oglimmer.bcg.logic.Player;
 public class AffiliationCard extends SwlcgObjectiveCard {
 
 	public AffiliationCard(Player owner, CardDeck cl, String name,
-			String imageUrl, String backImageUrl) {
-		super(owner, cl, "Affilication", imageUrl, backImageUrl);
+			String imageUrl, String backImageUrl, Map<String, String> prop) {
+		super(owner, cl, "Affilication", imageUrl, backImageUrl, prop);
 	}
 
 	@Override

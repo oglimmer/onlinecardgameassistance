@@ -11,13 +11,13 @@ import org.xml.sax.SAXException;
 import de.oglimmer.bcg.logic.Card;
 import de.oglimmer.bcg.logic.CardList;
 import de.oglimmer.bcg.logic.CardsSet;
-import de.oglimmer.bcg.logic.Game;
 import de.oglimmer.bcg.logic.GameException;
 import de.oglimmer.bcg.logic.Player;
 import de.oglimmer.bcg.logic.config.AbstractCardsFactory;
 import de.oglimmer.bcg.logic.config.CardsFactory;
+import de.oglimmer.bcg.logic.config.OctgnCardsFactory;
 
-class SwlcgCardsFactory extends AbstractCardsFactory implements CardsFactory {
+class SwlcgCardsFactory extends OctgnCardsFactory implements CardsFactory {
 
 	private static final String COMMITED_FORCE_LIGHT = "Star Wars LCG Light - 0000b.jpg";
 	private static final String COMMITED_FORCE_DARK = "Star Wars LCG Dark - 0000b.jpg";
@@ -27,35 +27,48 @@ class SwlcgCardsFactory extends AbstractCardsFactory implements CardsFactory {
 	private static final String[] REF_FILES = { "/Core.xml",
 			"/Desolation-Of-Hoth.xml" };
 
-	private String forceImageUrl;
+	private class Data extends AbstractCardsFactory.Data {
+		public Data(Player owner, InputStream deckStream,
+				String cardBackgroundUrl, String forceImageUrl) {
+			super(owner, deckStream, cardBackgroundUrl);
+			this.forceImageUrl = forceImageUrl;
+		}
 
-	public SwlcgCardsFactory(Game game, Player owner, InputStream deckStream) {
-		super(game, owner, deckStream,
-				(owner.getSide() == SwlcgSide.DARK ? DEFAULT_BACKGROUND_DARK
-						: DEFAULT_BACKGROUND_LIGHT));
-		this.forceImageUrl = (owner.getSide() == SwlcgSide.DARK ? COMMITED_FORCE_DARK
-				: COMMITED_FORCE_LIGHT);
+		public String forceImageUrl;
+	}
+
+	public SwlcgCardsFactory() {
+		super();
 	}
 
 	@Override
-	public CardsSet createCardsSet() {
+	public CardsSet createCardsSet(Player player, InputStream deckStream) {
 		try {
-			CardList table = createUniqueTable();
-			cards.add(new CardList(SwlcgCardDeck.LISTNAME_HAND));
-			createObjectiveDeck();
-			createCommandDeck();
-			handleAffiliationDeck(table);
-			createDiscardDeck();
-			createLostobjectivesDeck();
-			return new CardsSet(game, owner, playerNo, cards);
+			Data data = new Data(
+					player,
+					deckStream,
+					(player.getSide() == SwlcgSide.DARK ? DEFAULT_BACKGROUND_DARK
+							: DEFAULT_BACKGROUND_LIGHT),
+					player.getSide() == SwlcgSide.DARK ? COMMITED_FORCE_DARK
+							: COMMITED_FORCE_LIGHT);
+
+			CardList table = createUniqueTable(data);
+			data.cards.add(new CardList(SwlcgCardDeck.LISTNAME_HAND));
+			createObjectiveDeck(data);
+			createCommandDeck(data);
+			handleAffiliationDeck(table, data);
+			createDiscardDeck(data);
+			createLostobjectivesDeck(data);
+			return new CardsSet(data.owner.getGame(), data.owner,
+					data.playerNo, data.cards);
 		} catch (ParserConfigurationException | SAXException | IOException e) {
 			throw new GameException("Failed to set JSON data", e);
 		}
 	}
 
-	private synchronized CardList createUniqueTable() {
+	private synchronized CardList createUniqueTable(Data data) {
 		CardList table = null;
-		for (Player play : game.getPlayers().getPlayers()) {
+		for (Player play : data.owner.getGame().getPlayers().getPlayers()) {
 			CardList tableList = play.getCardStacks().get(
 					CardList.LISTNAME_TABLE);
 			if (tableList != null) {
@@ -63,10 +76,10 @@ class SwlcgCardsFactory extends AbstractCardsFactory implements CardsFactory {
 			}
 		}
 		if (table != null) {
-			cards.add(table);
+			data.cards.add(table);
 		} else {
 			table = new CardList(CardList.LISTNAME_TABLE);
-			cards.add(table);
+			data.cards.add(table);
 			Card balanceCard = new BalanceOfTheForceCard();
 			balanceCard.setFaceup(true);
 			balanceCard.setX(10);
@@ -82,64 +95,64 @@ class SwlcgCardsFactory extends AbstractCardsFactory implements CardsFactory {
 		return table;
 	}
 
-	private void createDiscardDeck() {
-		int discardDeckPos = 100 + 100 * playerNo;
+	private void createDiscardDeck(Data data) {
+		int discardDeckPos = 100 + 100 * data.playerNo;
 		CardList discardDeck = new SwlcgCardDeck(
 				SwlcgCardDeck.DECKNAME_DISCARD, SwlcgCardDeck.DECKDESC_DISCARD,
-				owner, 10, discardDeckPos, true);
-		cards.add(discardDeck);
+				data.owner, 10, discardDeckPos, true);
+		data.cards.add(discardDeck);
 	}
 
-	private void createLostobjectivesDeck() {
+	private void createLostobjectivesDeck(Data data) {
 		CardList lostObjectivesDeck = new SwlcgCardDeck(
 				SwlcgCardDeck.DECKNAME_LOSTOBJECTIVES,
-				SwlcgCardDeck.DECKDESC_LOSTOBJECTIVES, owner, 0, 0, true);
-		cards.add(lostObjectivesDeck);
+				SwlcgCardDeck.DECKDESC_LOSTOBJECTIVES, data.owner, 0, 0, true);
+		data.cards.add(lostObjectivesDeck);
 	}
 
-	private void handleAffiliationDeck(CardList table)
+	private void handleAffiliationDeck(CardList table, Data data)
 			throws ParserConfigurationException, SAXException, IOException {
 		CardList affiliationDeck = new SwlcgCardDeck(
-				SwlcgCardDeck.DECKNAME_AFFILIATION, "", owner, 0, 0, false);
-		addCards(affiliationDeck, getImageUrls("Affiliation"),
-				AffiliationCard.class);
+				SwlcgCardDeck.DECKNAME_AFFILIATION, "", data.owner, 0, 0, false);
+		addCards(affiliationDeck, getImageUrls("Affiliation", data),
+				AffiliationCard.class, data);
 
 		// special case: affiliationDeck has only one card and that one goes
 		// directly to the table
 		Card affiCard = affiliationDeck.getCards().get(0);
 		affiCard.setFaceup(true);
-		affiCard.setX(affiCard.getX() + 200 * playerNo);
+		affiCard.setX(affiCard.getX() + 200 * data.playerNo);
 		table.getCards().add(affiCard);
 
 		for (int i = 0; i < 3; i++) {
-			Card force = new CommitForceCard(owner, forceImageUrl);
+			Card force = new CommitForceCard(data.owner, data.forceImageUrl);
 			force.setFaceup(true);
 			force.setY(200);
-			force.setX(force.getX() + 200 * playerNo + i * 20);
+			force.setX(force.getX() + 200 * data.playerNo + i * 20);
 			table.getCards().add(force);
 		}
 	}
 
-	private void createCommandDeck() throws ParserConfigurationException,
-			SAXException, IOException {
+	private void createCommandDeck(Data data)
+			throws ParserConfigurationException, SAXException, IOException {
 		CardList commandDeck = new SwlcgCardDeck(
 				SwlcgCardDeck.DECKNAME_COMMAND, SwlcgCardDeck.DECKDESC_COMMAND,
-				owner, 10, 100, false);
-		addCards(commandDeck, getImageUrls("Command Deck"),
-				SwlcgCommandCard.class);
+				data.owner, 10, 100, false);
+		addCards(commandDeck, getImageUrls("Command Deck", data),
+				SwlcgCommandCard.class, data);
 		Collections.shuffle(commandDeck.getCards());
-		cards.add(commandDeck);
+		data.cards.add(commandDeck);
 	}
 
-	private void createObjectiveDeck() throws ParserConfigurationException,
-			SAXException, IOException {
+	private void createObjectiveDeck(Data data)
+			throws ParserConfigurationException, SAXException, IOException {
 		CardList objectiveDeck = new SwlcgCardDeck(
 				SwlcgCardDeck.DECKNAME_OBJECTIVE,
-				SwlcgCardDeck.DECKDESC_OBJECTIVE, owner, 10, 10, false);
-		addCards(objectiveDeck, getImageUrls("Objective Deck"),
-				SwlcgObjectiveCard.class);
+				SwlcgCardDeck.DECKDESC_OBJECTIVE, data.owner, 10, 10, false);
+		addCards(objectiveDeck, getImageUrls("Objective Deck", data),
+				SwlcgObjectiveCard.class, data);
 		Collections.shuffle(objectiveDeck.getCards());
-		cards.add(objectiveDeck);
+		data.cards.add(objectiveDeck);
 	}
 
 	@Override
