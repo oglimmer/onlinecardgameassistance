@@ -47,8 +47,6 @@ class SwccgCardDeck extends CardDeck {
 				menu.add("Lose top card:deckToDeck:lost_top");
 				menu.add("-");
 				menu.add("Shuffle:shuffle");
-				menu.add("-");
-				menu.add("Search deck:searchStart");
 				break;
 			case DECKNAME_USEDPILE:
 				menu.add("Put all cards back under reserve deck:deckToDeck:reserve_all");
@@ -61,8 +59,6 @@ class SwccgCardDeck extends CardDeck {
 				menu.add("Lose top card:deckToDeck:lost_top");
 				menu.add("-");
 				menu.add("Shuffle:shuffle");
-				menu.add("-");
-				menu.add("Search deck:searchStart");
 				break;
 			case DECKNAME_LOSTPILE:
 				menu.add("Take top card into hand:deckToHand");
@@ -71,8 +67,6 @@ class SwccgCardDeck extends CardDeck {
 				menu.add("Play top card face down on table:deckToTable:down");
 				menu.add("-");
 				menu.add("Shuffle:shuffle");
-				menu.add("-");
-				menu.add("Search deck:searchStart");
 				break;
 			case DECKNAME_RESERVEDECK:
 				menu.add("Activate one force:deckToDeck:force_top");
@@ -85,11 +79,14 @@ class SwccgCardDeck extends CardDeck {
 				menu.add("Lose top card:deckToDeck:lost_top");
 				menu.add("-");
 				menu.add("Shuffle:shuffle");
-				menu.add("-");
-				menu.add("Search deck:searchStart");
 				break;
 			}
+			menu.add("-");
+			menu.add("Make face " + (isOpenCardList() ? "down" : "up")
+					+ " card deck:changeOpenness");
 		}
+		menu.add("-");
+		menu.add("Search deck:searchStart");
 		json.element("menu", menu);
 	}
 }

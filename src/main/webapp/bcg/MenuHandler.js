@@ -17,8 +17,6 @@ return declare(null, {
 	    });
 		pMenu.attachedCardId = nodeId;
 		this.menuToNodeMapping[nodeId] = pMenu;
-		console.log("nodeId="+nodeId);
-		console.log(entries);
 		arrayUtil.forEach(entries, function(item, index) {
 			if(item.type==0) {
 				pMenu.addChild(new MenuSeparator());

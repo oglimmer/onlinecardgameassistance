@@ -14,7 +14,7 @@ import de.oglimmer.bcg.logic.Player;
 public class InitAction extends AbstractAction implements Action {
 
 	private void createTableCards(Game game, Player player, List<Object[]> msg) {
-		for (Card card : player.getCardStacks().get("table").getCards()) {
+		for (Card card : player.getCardStacks().getByName("table").getCards()) {
 			JSONObject json = card.toJSON(player, JSONPayload.BASE,
 					JSONPayload.COUNTER, JSONPayload.HIGHLIGHT,
 					JSONPayload.GRADE);
@@ -25,7 +25,7 @@ public class InitAction extends AbstractAction implements Action {
 	}
 
 	private void createHandCards(Game game, Player player, List<Object[]> msg) {
-		for (Card card : player.getCardStacks().get("hand").getCards()) {
+		for (Card card : player.getCardStacks().getByName("hand").getCards()) {
 			JSONObject json = card.toJSON(player, JSONPayload.BASE);
 			json.element("areaId", "hand");
 			json.element("moveable", true);

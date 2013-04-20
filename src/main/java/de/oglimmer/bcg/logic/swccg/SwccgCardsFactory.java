@@ -32,6 +32,8 @@ import de.oglimmer.bcg.util.JSONArrayList;
 
 class SwccgCardsFactory extends AbstractCardsFactory implements CardsFactory {
 
+	private static final String CARDDATA_TXT = "/carddata.txt";
+
 	private static final Logger log = LoggerFactory
 			.getLogger(SwccgCardsFactory.class);
 
@@ -70,31 +72,36 @@ class SwccgCardsFactory extends AbstractCardsFactory implements CardsFactory {
 	}
 
 	private void createSearchCategories(Player player, Data data) {
-		for (SearchCategory sc : player.getGame().getSearchCategories()) {
-			addValuesForSearchCategory(sc, data, "Set");
-			addValuesForSearchCategory(sc, data, "Category");
-		}
+		addValuesForSearchCategory(data, "Set");
+		addValuesForSearchCategory(data, "Category");
 	}
 
-	private void addValuesForSearchCategory(SearchCategory sc, Data data,
-			String searchCategoryName) {
-		if (searchCategoryName.equals(sc.getName())) {
-			Set<String> all = new HashSet<>();
-			for (CardList cl : data.cards) {
-				if (SwccgCardDeck.DECKNAME_RESERVEDECK.equals(cl.getName())) {
-					for (Card c : cl.getCards()) {
-						all.add(c.getProps().get(searchCategoryName));
-					}
+	private void addValuesForSearchCategory(Data data, String searchCategoryName) {
+		SearchCategory sc = data.owner.getGame().getSearchCategories()
+				.getByName(searchCategoryName);
+		// VALUES FOR THIS PLAYER
+		Set<String> all = new HashSet<>();
+		for (CardList cl : data.cards) {
+			if (SwccgCardDeck.DECKNAME_RESERVEDECK.equals(cl.getName())) {
+				for (Card c : cl.getCards()) {
+					all.add(c.getProps().get(searchCategoryName));
 				}
 			}
-			sc.setValues(new JSONArrayList<>(all), data.owner);
 		}
+		sc.setValues(new JSONArrayList<>(all), data.owner);
+
+		// ALL VALUES
+		all = new HashSet<>();
+		for (Map<String, String> en : cache.values()) {
+			all.add(en.get(searchCategoryName));
+		}
+		sc.setValues(new JSONArrayList<>(all), null);
 	}
 
 	private synchronized CardList createUniqueTable(Data data) {
 		CardList table = null;
 		for (Player play : data.owner.getGame().getPlayers().getPlayers()) {
-			CardList tableList = play.getCardStacks().get(
+			CardList tableList = play.getCardStacks().getByName(
 					CardList.LISTNAME_TABLE);
 			if (tableList != null) {
 				table = tableList;
@@ -193,7 +200,7 @@ class SwccgCardsFactory extends AbstractCardsFactory implements CardsFactory {
 
 		try (BufferedReader br = new BufferedReader(new InputStreamReader(
 				new DataInputStream(this.getClass().getResourceAsStream(
-						"/carddata.txt"))))) {
+						CARDDATA_TXT))))) {
 			Arrays.sort(USED_SETS);
 			String strLine;
 			while ((strLine = br.readLine()) != null) {

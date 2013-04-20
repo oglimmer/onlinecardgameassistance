@@ -32,7 +32,7 @@ public class DeckToTableAction extends AbstractAction implements Action {
 		player.processMessage(cardJSON, text);
 		msg.add(new Object[] { "createCard", cardJSON });
 
-		if (owner || cards.isOpenCardList()) {
+		if (cards.isVisibleTo(player)) {
 			checkDeckMinus(player, cards, msg);
 		}
 
@@ -62,7 +62,7 @@ public class DeckToTableAction extends AbstractAction implements Action {
 
 		String deckId = parameters.getString("entityId");
 		boolean faceUp = "up".equals(parameters.getString("param"));
-		CardDeck cards = (CardDeck) player.getCardListById(deckId);
+		CardDeck cards = (CardDeck) player.getCardStacks().getById(deckId);
 
 		Card card = cards.getCards().remove(0);
 		moveCardToTable(game, player, cc, cards, card, faceUp);
@@ -70,7 +70,7 @@ public class DeckToTableAction extends AbstractAction implements Action {
 
 	public void moveCardToTable(Game game, Player player, ClientChannel cc,
 			CardDeck cards, Card card, boolean faceUp) {
-		player.getCardStacks().get(CardList.LISTNAME_TABLE).getCards()
+		player.getCardStacks().getByName(CardList.LISTNAME_TABLE).getCards()
 				.add(card);
 		card.setFaceup(faceUp);
 

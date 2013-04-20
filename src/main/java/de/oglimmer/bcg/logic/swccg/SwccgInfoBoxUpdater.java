@@ -15,17 +15,21 @@ public class SwccgInfoBoxUpdater implements InfoBoxUpdater {
 		CardsSet pcs = otherPlayer.getGame().getPlayers().getOther(otherPlayer)
 				.getCardStacks();
 
-		addInfoText(
-				othcs.get(CardList.LISTNAME_HAND).getCards().size(),
-				pcs.get(SwccgCardDeck.DECKNAME_RESERVEDECK).getCards().size(),
-				othcs.get(SwccgCardDeck.DECKNAME_RESERVEDECK).getCards().size(),
-				pcs.get(SwccgCardDeck.DECKNAME_FORCEPILE).getCards().size(),
-				othcs.get(SwccgCardDeck.DECKNAME_FORCEPILE).getCards().size(),
-				pcs.get(SwccgCardDeck.DECKNAME_USEDPILE).getCards().size(),
-				othcs.get(SwccgCardDeck.DECKNAME_USEDPILE).getCards().size(),
-				pcs.get(SwccgCardDeck.DECKNAME_LOSTPILE).getCards().size(),
-				othcs.get(SwccgCardDeck.DECKNAME_LOSTPILE).getCards().size(),
-				cardJSON);
+		addInfoText(othcs.getByName(CardList.LISTNAME_HAND).getCards().size(),
+				pcs.getByName(SwccgCardDeck.DECKNAME_RESERVEDECK).getCards()
+						.size(),
+				othcs.getByName(SwccgCardDeck.DECKNAME_RESERVEDECK).getCards()
+						.size(), pcs
+						.getByName(SwccgCardDeck.DECKNAME_FORCEPILE).getCards()
+						.size(),
+				othcs.getByName(SwccgCardDeck.DECKNAME_FORCEPILE).getCards()
+						.size(), pcs.getByName(SwccgCardDeck.DECKNAME_USEDPILE)
+						.getCards().size(),
+				othcs.getByName(SwccgCardDeck.DECKNAME_USEDPILE).getCards()
+						.size(), pcs.getByName(SwccgCardDeck.DECKNAME_LOSTPILE)
+						.getCards().size(),
+				othcs.getByName(SwccgCardDeck.DECKNAME_LOSTPILE).getCards()
+						.size(), cardJSON);
 	}
 
 	private void addInfoText(int playerHandCards, int yourReserve,

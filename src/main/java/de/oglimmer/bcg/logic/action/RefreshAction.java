@@ -26,8 +26,8 @@ public class RefreshAction extends AbstractAction {
 
 		List<Object[]> msgPly = new ArrayList<>();
 		List<Object[]> msgOpp = new ArrayList<>();
-		for (Card card : player.getCardStacks().get(CardList.LISTNAME_TABLE)
-				.getCards()) {
+		for (Card card : player.getCardStacks()
+				.getByName(CardList.LISTNAME_TABLE).getCards()) {
 			if (!(card instanceof DeathStarDialCard) && card.isOwner(player)) {
 				if (card.getCounter(0) > 0) {
 					card.modCounter(-1, 0);

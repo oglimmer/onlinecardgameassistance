@@ -54,18 +54,20 @@ public class SwccgGameConfig implements GameConfig {
 	}
 
 	public JSONArrayList<SearchCategory> getSearchCategories() {
-		JSONArrayList<SearchCategory> searchCategories = new JSONArrayList<>();
-		searchCategories.add(new SearchCategory("Name", "TEXT"));
-		searchCategories.add(new SearchCategory("Set", "LIST"));
-		searchCategories.add(new SearchCategory("Category", "LIST"));
-		searchCategories.add(new SearchCategory("Destiny", "TEXT"));
-		searchCategories.add(new SearchCategory("Restrictions", "TEXT"));
-		searchCategories.add(new SearchCategory("Stats", "TEXT"));
-		searchCategories.add(new SearchCategory("Deploy", "TEXT"));
-		searchCategories.add(new SearchCategory("Forfeit", "TEXT"));
-		searchCategories.add(new SearchCategory("Icons", "TEXT"));
-		searchCategories.add(new SearchCategory("Text", "TEXT"));
-		return searchCategories;
+		JSONArrayList<SearchCategory> sc = new JSONArrayList<>();
+		sc.add(new SearchCategory("Name", SearchCategory.Type.TEXT));
+		sc.add(new SearchCategory("Set", SearchCategory.Type.LIST));
+		sc.add(new SearchCategory("Category", SearchCategory.Type.LIST));
+		sc.add(new SearchCategory("Destiny", SearchCategory.Type.TEXT));
+		sc.add(new SearchCategory("Restrictions", SearchCategory.Type.TEXT));
+		sc.add(new SearchCategory("Stats", SearchCategory.Type.TEXT));
+		sc.add(new SearchCategory("Deploy", SearchCategory.Type.TEXT));
+		sc.add(new SearchCategory("Forfeit", SearchCategory.Type.TEXT));
+		sc.add(new SearchCategory("Icons", SearchCategory.Type.TEXT));
+		sc.add(new SearchCategory("Text", SearchCategory.Type.TEXT));
+		sc.add(new SearchCategory("Peek at top cards", SearchCategory.Type.NUM,
+				new String[] { "1", "2", "3", "4", "5", }));
+		return sc;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -118,13 +120,13 @@ public class SwccgGameConfig implements GameConfig {
 		private void associateDecksWithBoard(BoardArea ba,
 				CardsSet cardStacksPlayer) {
 			ba.addCardDeck((CardDeck) cardStacksPlayer
-					.get(SwccgCardDeck.DECKNAME_RESERVEDECK));
+					.getByName(SwccgCardDeck.DECKNAME_RESERVEDECK));
 			ba.addCardDeck((CardDeck) cardStacksPlayer
-					.get(SwccgCardDeck.DECKNAME_LOSTPILE));
+					.getByName(SwccgCardDeck.DECKNAME_LOSTPILE));
 			ba.addCardDeck((CardDeck) cardStacksPlayer
-					.get(SwccgCardDeck.DECKNAME_USEDPILE));
+					.getByName(SwccgCardDeck.DECKNAME_USEDPILE));
 			ba.addCardDeck((CardDeck) cardStacksPlayer
-					.get(SwccgCardDeck.DECKNAME_FORCEPILE));
+					.getByName(SwccgCardDeck.DECKNAME_FORCEPILE));
 		}
 	}
 }

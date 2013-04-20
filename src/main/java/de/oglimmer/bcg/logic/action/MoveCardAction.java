@@ -35,7 +35,7 @@ public class MoveCardAction extends AbstractAction implements Action {
 
 		Player otherPlayer = game.getPlayers().getOther(player);
 		if (uiEle instanceof CardDeck
-				|| player.getCardListByCardId(id).getName()
+				|| player.getCardStacks().getByCardId(id).getName()
 						.equals(CardList.LISTNAME_TABLE)) {
 			send(cc, id, otherPlayer, xPos, yPos);
 		}

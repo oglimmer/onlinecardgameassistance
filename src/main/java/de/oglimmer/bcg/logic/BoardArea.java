@@ -41,6 +41,10 @@ public class BoardArea implements JSONTransformable {
 		return name;
 	}
 
+	public boolean isCardDeckVisibleForPlayer(Player player, CardDeck cardDeck) {
+		return visibleFor.contains(player) && cardDeckList.contains(cardDeck);
+	}
+
 	@Override
 	public JSONObject toJSON(Player player, JSONPayload... payload) {
 		JSONObject json = new JSONObject();

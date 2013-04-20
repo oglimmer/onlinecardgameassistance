@@ -43,9 +43,13 @@ public class DeckToHandAction extends AbstractAction implements Action {
 	private void sendDeckOpponent(Game game, ClientChannel cc, CardDeck cards,
 			Player player, Player otherPlayer, Card card, boolean oldFaceup) {
 		List<Object[]> msg = new ArrayList<>();
+
+		if (cards.isVisibleTo(otherPlayer)) {
+			checkDeckMinus(otherPlayer, cards, msg);
+		}
+
 		String txt;
 		if (cards.isOpenCardList()) {
-			checkDeckMinus(otherPlayer, cards, msg);
 			txt = "Opponent took " + (oldFaceup ? card.getName() : "a card")
 					+ " from " + cards.getDescription() + " into the hand";
 		} else {
@@ -66,14 +70,15 @@ public class DeckToHandAction extends AbstractAction implements Action {
 
 		String deckId = parameters.getString("entityId");
 
-		CardDeck cards = (CardDeck) player.getCardListById(deckId);
+		CardDeck cards = (CardDeck) player.getCardStacks().getById(deckId);
 		Card card = cards.getCards().remove(0);
 		moveCardToHand(game, player, cc, cards, card);
 	}
 
 	public void moveCardToHand(Game game, Player player, ClientChannel cc,
 			CardDeck cards, Card card) {
-		player.getCardStacks().get(CardList.LISTNAME_HAND).getCards().add(card);
+		player.getCardStacks().getByName(CardList.LISTNAME_HAND).getCards()
+				.add(card);
 
 		boolean oldFaceup = card.isFaceup();
 		card.setFaceup(true);

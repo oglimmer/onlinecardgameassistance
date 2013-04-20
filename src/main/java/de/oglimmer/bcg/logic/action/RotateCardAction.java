@@ -9,12 +9,9 @@ import de.oglimmer.bcg.logic.Player;
 
 public class RotateCardAction extends AbstractAction implements Action {
 
-	private void send(Card card, Player player, ClientChannel cc, String text,
-			int grade) {
+	private void send(Card card, Player player, ClientChannel cc, int grade) {
 		JSONObject cardJSON = card.toJSON(player, JSONPayload.ID,
 				JSONPayload.GRADE);
-		player.processMessage(cardJSON, text);
-
 		send(player, cc, "rotateCard", cardJSON);
 	}
 
@@ -25,13 +22,12 @@ public class RotateCardAction extends AbstractAction implements Action {
 		String cardId = parameters.getString("entityId");
 		int grade = parameters.getInt("param");
 
-		Card card = player.getCard(cardId);
+		Card card = player.getCardStacks().getCard(cardId);
 		card.setGrade(grade);
 
-		send(card, player, cc, "You rotated " + card.getName(), grade);
+		send(card, player, cc, grade);
 
 		Player otherPlayer = game.getPlayers().getOther(player);
-		send(card, otherPlayer, cc, "Opponent rotated "
-				+ (card.isFaceup() ? card.getName() : "a card"), grade);
+		send(card, otherPlayer, cc, grade);
 	}
 }

@@ -21,6 +21,17 @@ public class Board {
 		this.areas = areas;
 	}
 
+	public boolean isCardDeckVisibleForPlayer(Player player, CardDeck cardDeck) {
+		boolean ret = false;
+		for (BoardArea ba : areas) {
+			if (ba.isCardDeckVisibleForPlayer(player, cardDeck)) {
+				ret = true;
+				break;
+			}
+		}
+		return ret;
+	}
+
 	/**
 	 * Get a cardlist where a certain card is located
 	 * 

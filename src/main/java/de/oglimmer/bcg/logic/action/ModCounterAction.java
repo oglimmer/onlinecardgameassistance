@@ -27,7 +27,7 @@ public class ModCounterAction extends AbstractAction {
 		String mode[] = parameters.getString("param").split("-");
 		boolean add = "add".equals(mode[0]);
 		int pos = Integer.parseInt(mode[1]);
-		Card card = player.getCard(cardId);
+		Card card = player.getCardStacks().getCard(cardId);
 
 		if (card.getCounter(pos) != 0 || add) {
 			card.modCounter(add ? 1 : -1, pos);

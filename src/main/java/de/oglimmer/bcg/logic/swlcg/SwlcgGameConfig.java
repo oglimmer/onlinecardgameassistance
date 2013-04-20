@@ -59,14 +59,18 @@ public class SwlcgGameConfig implements GameConfig {
 					Player player0, Player player1) {
 				if (ba.getName().equals("table")) {
 					CardsSet cardStacksPlayer = player0.getCardStacks();
-					ba.addCardDeck((CardDeck) cardStacksPlayer.get("discard"));
+					ba.addCardDeck((CardDeck) cardStacksPlayer
+							.getByName("discard"));
 
 					cardStacksPlayer = player1.getCardStacks();
-					ba.addCardDeck((CardDeck) cardStacksPlayer.get("discard"));
+					ba.addCardDeck((CardDeck) cardStacksPlayer
+							.getByName("discard"));
 				} else if (ba.getName().equals("hand")) {
 					CardsSet cardStacksPlayer = player0.getCardStacks();
-					ba.addCardDeck((CardDeck) cardStacksPlayer.get("command"));
-					ba.addCardDeck((CardDeck) cardStacksPlayer.get("objective"));
+					ba.addCardDeck((CardDeck) cardStacksPlayer
+							.getByName("command"));
+					ba.addCardDeck((CardDeck) cardStacksPlayer
+							.getByName("objective"));
 				}
 			}
 		};

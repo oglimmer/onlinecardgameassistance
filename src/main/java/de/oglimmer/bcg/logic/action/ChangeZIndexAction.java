@@ -21,7 +21,7 @@ public class ChangeZIndexAction extends AbstractAction implements Action {
 
 		String cardId = parameters.getString("entityId");
 		String mode = parameters.getString("param");
-		Card card = player.getCard(cardId);
+		Card card = player.getCardStacks().getCard(cardId);
 
 		int newZIndex = "down".equals(mode) ? getSmallest(card)
 				: getHightest(card);

@@ -48,10 +48,10 @@ public class HandToTableAction extends AbstractAction implements Action {
 
 		String cardId = parameters.getString("entityId");
 		boolean faceUp = "up".equals(parameters.getString("param"));
-		Card card = player.getCard(cardId);
+		Card card = player.getCardStacks().getCard(cardId);
 		CardsSet cardStacks = player.getCardStacks();
-		cardStacks.get("hand").getCards().remove(card);
-		cardStacks.get("table").getCards().add(card);
+		cardStacks.getByName("hand").getCards().remove(card);
+		cardStacks.getByName("table").getCards().add(card);
 		card.setFaceup(faceUp);
 
 		sendOwner(game, player, cc, card, faceUp);

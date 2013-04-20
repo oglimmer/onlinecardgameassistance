@@ -20,7 +20,7 @@ public class FlipCardAction extends AbstractAction implements Action {
 			ClientChannel cc) {
 
 		String cardId = parameters.getString("entityId");
-		Card card = player.getCard(cardId);
+		Card card = player.getCardStacks().getCard(cardId);
 
 		boolean newStatus = !card.isFaceup();
 

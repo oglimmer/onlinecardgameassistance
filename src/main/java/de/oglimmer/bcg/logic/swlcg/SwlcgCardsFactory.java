@@ -69,7 +69,7 @@ class SwlcgCardsFactory extends OctgnCardsFactory implements CardsFactory {
 	private synchronized CardList createUniqueTable(Data data) {
 		CardList table = null;
 		for (Player play : data.owner.getGame().getPlayers().getPlayers()) {
-			CardList tableList = play.getCardStacks().get(
+			CardList tableList = play.getCardStacks().getByName(
 					CardList.LISTNAME_TABLE);
 			if (tableList != null) {
 				table = tableList;

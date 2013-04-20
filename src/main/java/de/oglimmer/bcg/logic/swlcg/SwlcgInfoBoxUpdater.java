@@ -8,12 +8,13 @@ class SwlcgInfoBoxUpdater implements InfoBoxUpdater {
 
 	@Override
 	public void addInfoText(Player otherPlayer, JSONObject cardJSON) {
-		addInfoText(otherPlayer.getCardStacks().get("hand").getCards().size(),
+		addInfoText(otherPlayer.getCardStacks().getByName("hand").getCards()
+				.size(),
 				otherPlayer.getGame().getPlayers().getOther(otherPlayer)
-						.getCardStacks().get("lostobjectives").getCards()
+						.getCardStacks().getByName("lostobjectives").getCards()
 						.size(),
-				otherPlayer.getCardStacks().get("lostobjectives").getCards()
-						.size(), cardJSON);
+				otherPlayer.getCardStacks().getByName("lostobjectives")
+						.getCards().size(), cardJSON);
 	}
 
 	private void addInfoText(int playerHandCards, int yourLostObj,

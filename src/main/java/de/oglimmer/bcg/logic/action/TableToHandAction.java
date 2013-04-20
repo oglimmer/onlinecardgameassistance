@@ -32,10 +32,10 @@ public class TableToHandAction extends AbstractAction implements Action {
 
 		String cardId = parameters.getString("entityId");
 
-		Card card = player.getCard(cardId);
-		player.getCardStacks().get("table").getCards().remove(card);
+		Card card = player.getCardStacks().getCard(cardId);
+		player.getCardStacks().getByName("table").getCards().remove(card);
 
-		player.getCardStacks().get("hand").getCards().add(card);
+		player.getCardStacks().getByName("hand").getCards().add(card);
 		boolean oldFaceup = card.isFaceup();
 		card.setFaceup(true);
 		card.setX(200);

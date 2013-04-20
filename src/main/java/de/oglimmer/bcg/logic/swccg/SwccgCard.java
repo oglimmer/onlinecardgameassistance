@@ -39,11 +39,6 @@ public class SwccgCard extends Card {
 				}
 				menu.add("Play card face up on table:handToTable:up");
 				menu.add("Play card face down on table:handToTable:down");
-				menu.add("-");
-				menu.add("Put card on top of " + origin.getDescription()
-						+ ":returnToDeck:origin_top");
-				menu.add("Put card under " + origin.getDescription()
-						+ ":returnToDeck:origin_bottom");
 				break;
 			case CardList.LISTNAME_TABLE:
 				if (!menu.isEmpty()) {
@@ -51,18 +46,18 @@ public class SwccgCard extends Card {
 				}
 				menu.add("Rotate card:rotateCard:180");
 				menu.add("-");
-				menu.add("Put card on top of " + origin.getDescription()
-						+ ":returnToDeck:origin_top");
-				menu.add("Put card under " + origin.getDescription()
-						+ ":returnToDeck:origin_bottom");
-				menu.add("-");
 				menu.add("Take back into hand:tableToHand");
 				break;
 			}
-			if (!menu.isEmpty()) {
-				menu.add("-");
-			}
-			menu.add("Discard card:returnToDeck:lost_top");
+			menu.add("-");
+			menu.add("Put card on top of Reserve deck:returnToDeck:reserve_top");
+			menu.add("Put card under Reserve deck:returnToDeck:reserve_bottom");
+			menu.add("-");
+			menu.add("Put card on top of Used Pile:returnToDeck:used_top");
+			menu.add("-");
+			menu.add("Put card on top of Force Pile:returnToDeck:force_top");
+			menu.add("-");
+			menu.add("Lose card:returnToDeck:lost_top");
 		}
 		if (CardList.LISTNAME_TABLE.equals(areaOfCard)) {
 			if (!menu.isEmpty()) {

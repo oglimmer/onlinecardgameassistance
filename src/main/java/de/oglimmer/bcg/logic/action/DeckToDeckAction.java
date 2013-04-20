@@ -13,20 +13,20 @@ import de.oglimmer.bcg.logic.Player;
 public class DeckToDeckAction extends AbstractAction {
 
 	private void send(Player targetPlayer, ClientChannel cc,
-			CardDeck sourceDeck, CardDeck targetDeck, String text, boolean owner) {
+			CardDeck sourceDeck, CardDeck targetDeck, String text) {
 		List<Object[]> msg = new ArrayList<>();
 
 		addMessage(targetPlayer, cc, msg, text);
 		addInfoText(targetPlayer.getGame().getPlayers().getOther(targetPlayer),
 				msg);
-		if (owner || sourceDeck.isOpenCardList()) {
-			// the target deck needs to be updated if it is my own deck or an
-			// open deck
+		if (sourceDeck.isVisibleTo(targetPlayer)) {
+			// the target deck needs be be checked for an update if it is
+			// visible to the target player
 			checkDeckMinus(targetPlayer, sourceDeck, msg);
 		}
-		if (owner || targetDeck.isOpenCardList()) {
-			// the target deck needs to be updated if it is my own deck or an
-			// open deck
+		if (targetDeck.isVisibleTo(targetPlayer)) {
+			// the target deck needs be be checked for an update if it is
+			// visible to the target player
 			checkDeckPlus(targetPlayer, targetDeck, msg);
 		}
 
@@ -41,14 +41,14 @@ public class DeckToDeckAction extends AbstractAction {
 		String txt = "Opponent put a card to the " + location + " of the "
 				+ targetDeck.getDescription();
 
-		send(opponent, cc, sourceDeck, targetDeck, txt, false);
+		send(opponent, cc, sourceDeck, targetDeck, txt);
 
 	}
 
 	private void sendOwner(Player owner, ClientChannel cc, String location,
 			CardDeck sourceDeck, CardDeck targetDeck) {
 		send(owner, cc, sourceDeck, targetDeck, "You put a card to the "
-				+ location + " of the " + targetDeck.getDescription(), true);
+				+ location + " of the " + targetDeck.getDescription());
 	}
 
 	private void returnToTargetDeck(Card card, CardDeck targetDeck,
@@ -73,8 +73,8 @@ public class DeckToDeckAction extends AbstractAction {
 		String targetDeckName = params[0];
 		String location = params[1];
 
-		CardDeck sourceDeck = (CardDeck) player.getCardListById(deckId);
-		CardDeck targetDeck = (CardDeck) player.getCardStacks().get(
+		CardDeck sourceDeck = (CardDeck) player.getCardStacks().getById(deckId);
+		CardDeck targetDeck = (CardDeck) player.getCardStacks().getByName(
 				targetDeckName);
 
 		moveCardToDeck(game, player, cc, sourceDeck, targetDeck, location);

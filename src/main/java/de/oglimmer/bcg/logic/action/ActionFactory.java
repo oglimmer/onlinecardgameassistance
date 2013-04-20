@@ -34,6 +34,7 @@ public enum ActionFactory {
 		def.add(new SearchStartAction());
 		def.add(new SearchDoAction());
 		def.add(new SearchOperateOnResultAction());
+		def.add(new ChangeOpennessAction());
 	}
 
 	public Action getAction(String actionId) {

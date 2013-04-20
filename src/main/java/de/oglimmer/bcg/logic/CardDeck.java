@@ -36,6 +36,10 @@ public abstract class CardDeck extends CardList implements JSONTransformable,
 		return openCardList;
 	}
 
+	public void setOpenCardList(boolean openCardList) {
+		this.openCardList = openCardList;
+	}
+
 	public int[] getZIndexBorders() {
 		return zIndexBorders;
 	}
@@ -54,6 +58,11 @@ public abstract class CardDeck extends CardList implements JSONTransformable,
 		return description;
 	}
 
+	public boolean isVisibleTo(Player player) {
+		return player.getGame().getBoard()
+				.isCardDeckVisibleForPlayer(player, this);
+	}
+
 	@Override
 	public JSONObject toJSON(Player player, JSONPayload... payload) {
 		JSONObject json = new JSONObject();
@@ -62,7 +71,7 @@ public abstract class CardDeck extends CardList implements JSONTransformable,
 			imageUrl = emptyImageUrl;
 		} else {
 			Card c = getCards().get(0);
-			if (c.isFaceup()) {
+			if (isOpenCardList()) {
 				imageUrl = c.getImageUrl();
 			} else {
 				imageUrl = c.getBackImageUrl();
@@ -77,4 +86,5 @@ public abstract class CardDeck extends CardList implements JSONTransformable,
 		addMenu(player, json);
 		return json;
 	}
+
 }

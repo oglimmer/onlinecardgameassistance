@@ -15,7 +15,7 @@ public class ShuffleAction extends AbstractAction implements Action {
 			ClientChannel cc) {
 
 		String deckId = parameters.getString("entityId");
-		CardDeck cards = (CardDeck) player.getCardListById(deckId);
+		CardDeck cards = (CardDeck) player.getCardStacks().getById(deckId);
 
 		Collections.shuffle(cards.getCards());
 

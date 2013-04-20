@@ -21,7 +21,7 @@ import de.oglimmer.bcg.logic.Player;
 public class ReturnToDeckAction extends AbstractAction implements Action {
 
 	private void send(Player targetPlayer, ClientChannel cc, Card card,
-			CardDeck targetDeck, String text, boolean owner) {
+			CardDeck targetDeck, String text) {
 		List<Object[]> msg = new ArrayList<>();
 
 		// main msg
@@ -29,7 +29,7 @@ public class ReturnToDeckAction extends AbstractAction implements Action {
 		targetPlayer.processMessage(cardJSON, text);
 		msg.add(new Object[] { "remove", cardJSON });
 
-		if (owner || targetDeck.isOpenCardList()) {
+		if (targetDeck.isVisibleTo(targetPlayer)) {
 			// the target deck needs to be updated if it is my own deck or an
 			// open deck
 			checkDeckPlus(targetPlayer, targetDeck, msg);
@@ -50,7 +50,7 @@ public class ReturnToDeckAction extends AbstractAction implements Action {
 		Player opponent = game.getPlayers().getOther(player);
 
 		if (CardList.LISTNAME_HAND.equals(oldCardList.getName())
-				&& !targetDeck.isOpenCardList()) {
+				&& !targetDeck.isVisibleTo(player)) {
 			// if the card was in the hand and it doesn't go to an open deck =>
 			// just send a message to the opponent
 			String txt = "Opponent put a card to the " + location + " of the "
@@ -67,7 +67,7 @@ public class ReturnToDeckAction extends AbstractAction implements Action {
 					+ " to the " + location + " of the "
 					+ targetDeck.getDescription();
 
-			send(opponent, cc, card, targetDeck, txt, false);
+			send(opponent, cc, card, targetDeck, txt);
 		}
 	}
 
@@ -79,7 +79,7 @@ public class ReturnToDeckAction extends AbstractAction implements Action {
 				targetDeck,
 				"You put " + (card.isFaceup() ? card.getName() : "a card")
 						+ " to the " + location + " of the "
-						+ targetDeck.getDescription(), true);
+						+ targetDeck.getDescription());
 	}
 
 	private CardDeck returnToTargetDeck(String deckName, String location,
@@ -88,7 +88,7 @@ public class ReturnToDeckAction extends AbstractAction implements Action {
 		currentCardList.getCards().remove(card);
 
 		CardDeck targetDeck = (CardDeck) ("origin".equals(deckName) ? card
-				.getOrigin() : player.getCardStacks().get(deckName));
+				.getOrigin() : player.getCardStacks().getByName(deckName));
 		assert targetDeck != null : deckName + " not found";
 
 		if ("top".equals(location)) {
@@ -111,8 +111,8 @@ public class ReturnToDeckAction extends AbstractAction implements Action {
 		String deckName = params[0];
 		String location = params[1];
 
-		Card card = player.getCard(cardId);
-		CardList currentCardList = player.getCardListByCardId(cardId);
+		Card card = player.getCardStacks().getCard(cardId);
+		CardList currentCardList = player.getCardStacks().getByCardId(cardId);
 
 		CardDeck targetDeck = returnToTargetDeck(deckName, location, card,
 				currentCardList, player);

@@ -17,13 +17,20 @@ public class SearchStartAction extends AbstractAction {
 	public void execute(Game game, Player player, JSONObject parameters,
 			ClientChannel cc) {
 		String deckId = parameters.getString("entityId");
-		CardDeck cardDeck = (CardDeck) player.getCardListById(deckId);
+
+		Player deckOwner = player;
+		CardDeck cardDeck = (CardDeck) player.getCardStacks().getById(deckId);
+		if (cardDeck == null) {
+			deckOwner = game.getPlayers().getOther(player);
+			cardDeck = (CardDeck) deckOwner.getCardStacks().getById(deckId);
+		}
 
 		JSONObject obj = new JSONObject();
-		JSONArray data = game.getSearchCategories().toJsonArray(player);
+		JSONArray data = game.getSearchCategories().toJsonArray(
+				deckOwner == player ? player : null);
 		obj.element("searchCategories", data);
 		obj.element("deckId", cardDeck.getId());
-		obj.element("targets", getTargets(cardDeck, player));
+		obj.element("targets", getTargets(cardDeck, deckOwner));
 
 		send(player, cc, "searchStart", obj);
 	}
