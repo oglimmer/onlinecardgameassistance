@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -40,8 +39,6 @@ class SwccgCardsFactory extends AbstractCardsFactory implements CardsFactory {
 	private static final String DEFAULT_BACKGROUND_LIGHT = "misc/light-back.jpg";
 	private static final String DEFAULT_BACKGROUND_DARK = "misc/dark-back.jpg";
 	static final String EMPTY_CARDS_IMG = "misc/Star Wars LCG - 0000.jpg";
-
-	private static final String[] USED_SETS = { "ANewHope", "Hoth", "Premiere" };
 
 	private Map<String, Map<String, String>> cache = new HashMap<>();
 
@@ -201,13 +198,12 @@ class SwccgCardsFactory extends AbstractCardsFactory implements CardsFactory {
 		try (BufferedReader br = new BufferedReader(new InputStreamReader(
 				new DataInputStream(this.getClass().getResourceAsStream(
 						CARDDATA_TXT))))) {
-			Arrays.sort(USED_SETS);
 			String strLine;
 			while ((strLine = br.readLine()) != null) {
 				String[] tmp = strLine.split("\t");
 
 				String Set = tmp[1].trim();
-				if (Arrays.binarySearch(USED_SETS, Set) > -1) {
+				if (!Set.startsWith("Virtual")) {
 					String Name = tmp[0].trim();
 					String Side = tmp[3].trim();
 					String[] CategoryPrep = tmp[4].split(" -- ");
@@ -221,9 +217,11 @@ class SwccgCardsFactory extends AbstractCardsFactory implements CardsFactory {
 					}
 					props.put("ImageFile", ImageFile);
 
-					props.put("Category", CategoryPrep[0].trim());
+					props.put("Category",
+							removeNonAscii(CategoryPrep[0].trim()));
 					if (CategoryPrep.length > 1) {
-						props.put("Subcategory", CategoryPrep[1].trim());
+						props.put("Subcategory",
+								removeNonAscii(CategoryPrep[1].trim()));
 					}
 
 					String id = removeNonAscii(Name + Set + Side);

@@ -20,7 +20,7 @@
 
 
 	<div id="mainDiv" style="border:3px solid black;padding:5px;font-family:Arial;margin-bottom:5px;">
-		<% if( (Boolean)session.getAttribute("permissionStartGame") ) { %>
+		<% if( session.getAttribute("permissionStartGame") != null && (Boolean)session.getAttribute("permissionStartGame") ) { %>
 		To start a new
 		<select id="gametype">
 			<option value="swlcg">SWLCG</option>

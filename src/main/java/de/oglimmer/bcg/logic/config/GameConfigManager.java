@@ -32,6 +32,8 @@ public enum GameConfigManager {
 	private Map<String, GameConfig> instances = new HashMap<>();
 
 	public GameConfig getGameConfig(String gametype) {
-		return instances.get(gametype);
+		GameConfig gc = instances.get(gametype);
+		log.debug("Start a game " + gc);
+		return gc;
 	}
 }

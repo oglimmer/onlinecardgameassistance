@@ -14,12 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-/**
- * Change the JSESSION cookie to live 7 days instead of until close-of-browser.
- * 
- * @author oli
- * 
- */
 public class SessionFilter implements Filter {
 	@Override
 	public void init(FilterConfig arg0) throws ServletException {
@@ -35,6 +29,20 @@ public class SessionFilter implements Filter {
 		HttpServletRequest httpReq = (HttpServletRequest) req;
 		HttpServletResponse httpResp = (HttpServletResponse) resp;
 		HttpSession session = httpReq.getSession();
+
+		if (httpReq.getRequestURI().endsWith("gif")
+				|| httpReq.getRequestURI().endsWith("png")
+				|| httpReq.getRequestURI().endsWith("jpg")) {
+			// cache images for a month
+			httpResp.addHeader("Cache-Control",
+					"public, max-age=2678400, s-maxage=2678400");
+		} else {
+			CrossContextSession.INSTANCE
+					.retrieveSessionFromServletContext(httpReq);
+			// nasty: the previous call might have invalidated the session
+			session = httpReq.getSession();
+		}
+
 		if (session.isNew()) {
 			String id = session.getId();
 			long expireTimestamp = System.currentTimeMillis()
