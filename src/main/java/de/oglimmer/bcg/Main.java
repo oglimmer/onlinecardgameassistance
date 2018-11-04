@@ -15,7 +15,7 @@ public enum Main {
 	private Server server;
 
 	public void startUp() {
-		WebSocket.DEBUG = false;
+		//WebSocket.DEBUG = false;
 		server = new Server(new InetSocketAddress("127.0.0.1", 8082));
 		server.start();
 		log.info("Server started on port: " + server.getPort());
