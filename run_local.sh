@@ -4,6 +4,7 @@ trap cleanup 2
 set -e
 
 
+
 #------------
 # FunctionsBuilder
 #------------
@@ -53,6 +54,8 @@ set -e
 
 
 
+
+
 #------------
 # CleanupBuilder
 #------------
@@ -65,19 +68,19 @@ cleanup()
   echo "****************************************************************"
 
   ALL_COMPONENTS=(couchdb tomcat)
-  for keepRunningAllElement in "${ALL_COMPONENTS[@]}"; do
-    IFS=',' read -r -a array <<< "$KEEP_RUNNING"
-    found=0
-    for keepRunningToFindeElement in "${array[@]}"; do
-      if [ "$keepRunningAllElement" == "$keepRunningToFindeElement" ]; then
-        echo "Not stopping $keepRunningAllElement!"
-        found=1
+  for componentToStop in "${ALL_COMPONENTS[@]}"; do
+    IFS=',' read -r -a keepRunningArray <<< "$KEEP_RUNNING"
+    componentFoundToKeepRunning=0
+    for keepRunningToFindeElement in "${keepRunningArray[@]}"; do
+      if [ "$componentToStop" == "$keepRunningToFindeElement" ]; then
+        echo "Not stopping $componentToStop!"
+        componentFoundToKeepRunning=1
       fi
     done
-    if [ "$found" -eq 0 ]; then
+    if [ "$componentFoundToKeepRunning" -eq 0 ]; then
       
-      if [ "$keepRunningAllElement" == "couchdb" ]; then
-        echo "Stopping $keepRunningAllElement ..."
+      if [ "$componentToStop" == "couchdb" ]; then
+        echo "Stopping $componentToStop ..."
         
         if [ "$TYPE_SOURCE_COUCHDB" == "docker" ]; then
          docker rm -f $dockerContainerIDcouchdb
@@ -86,8 +89,8 @@ cleanup()
         
       fi
       
-      if [ "$keepRunningAllElement" == "tomcat" ]; then
-        echo "Stopping $keepRunningAllElement ..."
+      if [ "$componentToStop" == "tomcat" ]; then
+        echo "Stopping $componentToStop ..."
         
         if [ "$TYPE_SOURCE_TOMCAT" == "docker" ]; then
          docker rm -f $dockerContainerIDtomcat
@@ -111,6 +114,8 @@ cleanup()
 
 
 
+
+
 #------------
 # OptionsBuilder
 #------------
@@ -125,12 +130,12 @@ where:
   -t [component:type:[path|version]] run component inside [docker] container, [download] component (default) or [local] use installed component from path
   -V                         enable Verbose
   -v                         start VirtualBox via vagrant, install all dependencies, ssh into the VM and run
-  -b local|docker:version    build locally (default) or within a maven image on docker, the default image is 3-jdk-10
+  -b local|docker:version    build locally (default) or within a maven image on docker, the default image is 3-jdk-11
   -f                         tail the apache catalina log at the end
   
 
 Details:
- -b docker:[3-jdk-8|3-jdk-9|3-jdk-10] #do a docker based build, uses \`maven:3-jdk-10\` image
+ -b docker:[3-jdk-8|3-jdk-9|3-jdk-10|3-jdk-11] #do a docker based build, uses maven:3-jdk-11 image
  -b local #do a local build, would respect -j
  -t couchdb:local #reuse a local, running CouchDB installation, does not start/stop this CouchDB
  -t couchdb:docker:[1.7|2] #start docker image couchdb:X
@@ -179,6 +184,8 @@ TYPE_PARAM="$1"
 
 
 
+
+
 #------------
 # DependencycheckBuilder
 #------------
@@ -191,20 +198,22 @@ java -version 2>/dev/null || exit 1;
 
 
 
+# clean if requested
+if [ -n "$CLEAN" ]; then
+  if [ "$CLEAN" == "all" ]; then
+    if [ "$VERBOSE" == "YES" ]; then echo "rm -rf localrun"; fi
+    rm -rf localrun
+  fi
+  
+
 #------------
 # CleanBuilder
 #------------
 
 
-# clean if requested
-if [ -n "$CLEAN" ]; then
-  if [ "$CLEAN" == "all" ]; then
-  	if [ "$VERBOSE" == "YES" ]; then echo "rm -rf localrun"; fi
-    rm -rf localrun
-  fi
-  
-fi
 
+
+fi
 
 
 
@@ -223,12 +232,13 @@ fi
 
 
 
+mkdir -p localrun
+
+
+
 #------------
 # PrepareBuilder
 #------------
-
-
-mkdir -p localrun
 
 
 
@@ -247,20 +257,34 @@ Vagrant.configure("2") do |config|
     vb.memory = "1024"
   end
   config.vm.provision "shell", inline: <<-SHELL
+  	
+    apt-get update    
     
-    apt-get update
-    apt-get install -y maven openjdk-8-jdk-headless docker.io
+      if [ "\$(cat /etc/*release|grep ^ID=)" = "ID=debian"  ]; then \\
+        if [ "\$(cat /etc/debian_version)" = "8.11" ]; then \\
+            apt-get -qy install maven openjdk-8-jdk-headless docker.io; \\
+        elif [ "\$(cat /etc/debian_version)" = "9.5" ]; then \\
+           apt-get -qy install maven openjdk-8-jdk-headless docker.io; \\
+        else  apt-get -qy install maven openjdk-8-jdk-headless docker.io; fi \\
+      elif [ "\$(cat /etc/*release|grep ^ID=)" = "ID=ubuntu"  ]; then \\
+         apt-get -qy install maven openjdk-8-jdk-headless docker.io; \\
+      else \\
+        echo "only debian or ubuntu are supported."; \\
+        exit 1; \\
+      fi \\
+    
+    
     
     echo "Now continue with..."
     echo "\$ cd /share_host"
-    echo "\$ ./run_local.sh -f"
+    echo "\$ sudo ./run_local.sh -f"
     echo "...then browse to http://localhost:8080/XXXX"
   SHELL
 end
 EOF
   vagrant up
   if [ -f "../run_local.sh" ]; then
-    vagrant ssh -c "cd /share_host && ./run_local.sh -f"
+    vagrant ssh -c "cd /share_host && sudo ./run_local.sh -f"
   else
     echo "Save the fulgens output into a bash script (e.g. run_local.sh) and use it inside the new VM"
   fi
@@ -268,102 +292,8 @@ EOF
 fi
 
 
+
 if [ "$(uname)" == "Darwin" ]; then export JAVA_HOME=$(/usr/libexec/java_home -v 1.8); fi
-
-
-
-
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# JavaPlugin // dependency
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-if [ -n "$VERBOSE" ]; then echo "JavaPlugin // dependency"; fi
-
-
-
-
-#------------
-# PrepareCompBuilder
-#------------
-
-
-
-
-
-
-
-#------------
-# GetsourceBuilder
-#------------
-
-
-
-
-
-
-
-#------------
-# PrebuildBuilder
-#------------
-
-
-
-
-
-
-
-#------------
-# BuildBuilder
-#------------
-
-
-
-
-
-
-
-#------------
-# PostbuildBuilder
-#------------
-
-
-
-
-
-
-
-#------------
-# PrestartBuilder
-#------------
-
-
-
-
-
-
-
-#------------
-# StartBuilder
-#------------
-
-
-
-
-
-
-
-#------------
-# PoststartBuilder
-#------------
-
-
-
-
-
-
-
-#------------
-# LeaveCompBuilder
-#------------
 
 
 
@@ -379,7 +309,7 @@ if [ -n "$VERBOSE" ]; then echo "MvnPlugin // couchdb4j"; fi
 
 
 #------------
-# PrepareCompBuilder
+# Plugin-PrepareComp
 #------------
 
 
@@ -396,7 +326,7 @@ if [ -n "$VERBOSE" ]; then echo "MvnPlugin // couchdb4j"; fi
 
 
 #------------
-# GetsourceBuilder
+# Plugin-GetSource
 #------------
 
 
@@ -414,7 +344,7 @@ if [ -n "$VERBOSE" ]; then echo "MvnPlugin // couchdb4j"; fi
 
 
 #------------
-# PrebuildBuilder
+# Plugin-PreBuild
 #------------
 
 
@@ -424,7 +354,7 @@ if [ -n "$VERBOSE" ]; then echo "MvnPlugin // couchdb4j"; fi
 
 
 #------------
-# BuildBuilder
+# Plugin-Build
 #------------
 
 
@@ -435,6 +365,7 @@ if [ "$BUILD" == "local" ]; then
   f_build() {
     if [ -n "$VERBOSE" ]; then echo "pwd=$(pwd)"; echo "mvn $MVN_CLEAN $MVN_OPTS -DskipTests=true install"; fi
     
+    
     mvn $MVN_CLEAN $MVN_OPTS -DskipTests=true install
     
   }
@@ -443,7 +374,7 @@ fi
 if [[ "$BUILD" == docker* ]]; then
   IFS=: read mainType dockerVersion <<< "$BUILD"
   if [ -z "$dockerVersion" ]; then
-    dockerVersion="3-jdk-10"
+    dockerVersion="3-jdk-11"
   fi
 
   
@@ -453,7 +384,7 @@ if [[ "$BUILD" == docker* ]]; then
   f_build() {
     if [ -n "$VERBOSE" ]; then echo "pwd=$(pwd)"; echo "docker run --rm -v $(pwd):/usr/src/build -v $(pwd)/localrun/.m2:/root/.m2 -w /usr/src/build $dockerImage:$dockerVersion mvn $MVN_CLEAN $MVN_OPTS -DskipTests=true install"; fi
     
-    docker run --rm -v "$(pwd)":/usr/src/build -v "$(pwd)/localrun/.m2":/root/.m2 -w /usr/src/build $dockerImage:$dockerVersion mvn $MVN_CLEAN $MVN_OPTS -DskipTests=true install
+    docker run --rm  -v "$(pwd)":/usr/src/build -v "$(pwd)/localrun/.m2":/root/.m2 -w /usr/src/build $dockerImage:$dockerVersion mvn $MVN_CLEAN $MVN_OPTS -DskipTests=true install
     
   }
 fi   
@@ -468,7 +399,7 @@ fi
 
 
 #------------
-# PostbuildBuilder
+# Plugin-PostBuild
 #------------
 
 
@@ -478,7 +409,7 @@ fi
 
 
 #------------
-# PrestartBuilder
+# Plugin-PreStart
 #------------
 
 
@@ -488,7 +419,7 @@ fi
 
 
 #------------
-# StartBuilder
+# Plugin-Start
 #------------
 
 
@@ -498,7 +429,7 @@ fi
 
 
 #------------
-# PoststartBuilder
+# Plugin-PostStart
 #------------
 
 
@@ -508,7 +439,7 @@ fi
 
 
 #------------
-# LeaveCompBuilder
+# Plugin-LeaveComp
 #------------
 
 
@@ -528,7 +459,7 @@ if [ -n "$VERBOSE" ]; then echo "MvnPlugin // bcg"; fi
 
 
 #------------
-# PrepareCompBuilder
+# Plugin-PrepareComp
 #------------
 
 
@@ -538,7 +469,7 @@ if [ -n "$VERBOSE" ]; then echo "MvnPlugin // bcg"; fi
 
 
 #------------
-# GetsourceBuilder
+# Plugin-GetSource
 #------------
 
 
@@ -548,7 +479,7 @@ if [ -n "$VERBOSE" ]; then echo "MvnPlugin // bcg"; fi
 
 
 #------------
-# PrebuildBuilder
+# Plugin-PreBuild
 #------------
 
 
@@ -558,7 +489,7 @@ if [ -n "$VERBOSE" ]; then echo "MvnPlugin // bcg"; fi
 
 
 #------------
-# BuildBuilder
+# Plugin-Build
 #------------
 
 
@@ -569,6 +500,7 @@ if [ "$BUILD" == "local" ]; then
   f_build() {
     if [ -n "$VERBOSE" ]; then echo "pwd=$(pwd)"; echo "mvn $MVN_CLEAN $MVN_OPTS package"; fi
     
+    
     mvn $MVN_CLEAN $MVN_OPTS package
     
   }
@@ -577,7 +509,7 @@ fi
 if [[ "$BUILD" == docker* ]]; then
   IFS=: read mainType dockerVersion <<< "$BUILD"
   if [ -z "$dockerVersion" ]; then
-    dockerVersion="3-jdk-10"
+    dockerVersion="3-jdk-11"
   fi
 
   
@@ -587,7 +519,7 @@ if [[ "$BUILD" == docker* ]]; then
   f_build() {
     if [ -n "$VERBOSE" ]; then echo "pwd=$(pwd)"; echo "docker run --rm -v $(pwd):/usr/src/build -v $(pwd)/localrun/.m2:/root/.m2 -w /usr/src/build $dockerImage:$dockerVersion mvn $MVN_CLEAN $MVN_OPTS package"; fi
     
-    docker run --rm -v "$(pwd)":/usr/src/build -v "$(pwd)/localrun/.m2":/root/.m2 -w /usr/src/build $dockerImage:$dockerVersion mvn $MVN_CLEAN $MVN_OPTS package
+    docker run --rm  -v "$(pwd)":/usr/src/build -v "$(pwd)/localrun/.m2":/root/.m2 -w /usr/src/build $dockerImage:$dockerVersion mvn $MVN_CLEAN $MVN_OPTS package
     
   }
 fi   
@@ -602,7 +534,7 @@ fi
 
 
 #------------
-# PostbuildBuilder
+# Plugin-PostBuild
 #------------
 
 
@@ -612,7 +544,7 @@ fi
 
 
 #------------
-# PrestartBuilder
+# Plugin-PreStart
 #------------
 
 
@@ -622,7 +554,7 @@ fi
 
 
 #------------
-# StartBuilder
+# Plugin-Start
 #------------
 
 
@@ -632,7 +564,7 @@ fi
 
 
 #------------
-# PoststartBuilder
+# Plugin-PostStart
 #------------
 
 
@@ -642,7 +574,7 @@ fi
 
 
 #------------
-# LeaveCompBuilder
+# Plugin-LeaveComp
 #------------
 
 
@@ -660,14 +592,16 @@ if [ -n "$VERBOSE" ]; then echo "CouchdbPlugin // couchdb"; fi
 
 
 #------------
-# PrepareCompBuilder
+# Plugin-PrepareComp
 #------------
+
 
 
 
 IFS=',' read -r -a array <<< "$TYPE_SOURCE"
 for typeSourceElement in "${array[@]}"; do
   IFS=: read comp type pathOrVersion <<< "$typeSourceElement"
+
   if [ "$comp" == "couchdb" ]; then
     TYPE_SOURCE_COUCHDB=$type
     if [ "$TYPE_SOURCE_COUCHDB" == "local" ]; then
@@ -679,12 +613,16 @@ for typeSourceElement in "${array[@]}"; do
 
 done
 
+
+
 if [ "$TYPE_SOURCE_COUCHDB" == "docker" ]; then
   if [ -z "$TYPE_SOURCE_COUCHDB_VERSION" ]; then
     TYPE_SOURCE_COUCHDB_VERSION=1.7
   fi
-  
+    
 fi
+
+
 
 if [ "$VERBOSE" == "YES" ]; then
   echo "TYPE_SOURCE_COUCHDB = $TYPE_SOURCE_COUCHDB // TYPE_SOURCE_COUCHDB_PATH = $TYPE_SOURCE_COUCHDB_PATH // TYPE_SOURCE_COUCHDB_VERSION = $TYPE_SOURCE_COUCHDB_VERSION"
@@ -697,7 +635,7 @@ fi
 
 
 #------------
-# GetsourceBuilder
+# Plugin-GetSource
 #------------
 
 
@@ -707,7 +645,7 @@ fi
 
 
 #------------
-# PrebuildBuilder
+# Plugin-PreBuild
 #------------
 
 
@@ -717,7 +655,7 @@ fi
 
 
 #------------
-# BuildBuilder
+# Plugin-Build
 #------------
 
 
@@ -727,7 +665,7 @@ fi
 
 
 #------------
-# PostbuildBuilder
+# Plugin-PostBuild
 #------------
 
 
@@ -737,7 +675,7 @@ fi
 
 
 #------------
-# PrestartBuilder
+# Plugin-PreStart
 #------------
 
 
@@ -747,7 +685,7 @@ fi
 
 
 #------------
-# StartBuilder
+# Plugin-Start
 #------------
 
 
@@ -758,9 +696,9 @@ if [ "$TYPE_SOURCE_COUCHDB" == "docker" ]; then
   # run in docker
   if [ ! -f ".couchdbPid" ]; then
     
-    if [ "$VERBOSE" == "YES" ]; then echo "docker run --rm -d -p 5984:5984 $dockerCouchdbExtRef  couchdb:$TYPE_SOURCE_COUCHDB_VERSION"; fi
+    if [ "$VERBOSE" == "YES" ]; then echo "docker run --rm -d -p 5984:5984 $dockerCouchdbExtRef   couchdb:$TYPE_SOURCE_COUCHDB_VERSION"; fi
     dockerContainerIDcouchdb=$(docker run --rm -d -p 5984:5984 $dockerCouchdbExtRef \
-       couchdb:$TYPE_SOURCE_COUCHDB_VERSION)
+        couchdb:$TYPE_SOURCE_COUCHDB_VERSION)
     echo "$dockerContainerIDcouchdb">.couchdbPid
   else
     dockerContainerIDcouchdb=$(<.couchdbPid)
@@ -776,7 +714,7 @@ fi
 
 
 #------------
-# PoststartBuilder
+# Plugin-PostStart
 #------------
 
 
@@ -801,7 +739,7 @@ fi
 
 
 #------------
-# LeaveCompBuilder
+# Plugin-LeaveComp
 #------------
 
 
@@ -819,14 +757,16 @@ if [ -n "$VERBOSE" ]; then echo "TomcatPlugin // tomcat"; fi
 
 
 #------------
-# PrepareCompBuilder
+# Plugin-PrepareComp
 #------------
+
 
 
 
 IFS=',' read -r -a array <<< "$TYPE_SOURCE"
 for typeSourceElement in "${array[@]}"; do
   IFS=: read comp type pathOrVersion <<< "$typeSourceElement"
+
   if [ "$comp" == "tomcat" ]; then
     TYPE_SOURCE_TOMCAT=$type
     if [ "$TYPE_SOURCE_TOMCAT" == "local" ]; then
@@ -838,12 +778,15 @@ for typeSourceElement in "${array[@]}"; do
 
 done
 
+
+
 if [ "$TYPE_SOURCE_TOMCAT" == "docker" ]; then
   if [ -z "$TYPE_SOURCE_TOMCAT_VERSION" ]; then
     TYPE_SOURCE_TOMCAT_VERSION=9
   fi
-  
+    
 fi
+
 
 
 if [ "$TYPE_SOURCE_TOMCAT" == "download" ]; then
@@ -857,8 +800,10 @@ if [ "$TYPE_SOURCE_TOMCAT" == "download" ]; then
   TOMCAT_BASE_URL="http://mirror.vorboss.net/apache/tomcat"
   TOMCAT_VERSION_PRE=$(curl -s "$TOMCAT_BASE_URL/tomcat-$TYPE_SOURCE_TOMCAT_VERSION/"|grep -m1 -o $GREP_PERL_MODE "<a href=\"v\d*.\d*.\d*" || echo "__________9.0.10")
   TOMCAT_VERSION=${TOMCAT_VERSION_PRE:10}
-  TOMCAT_URL=$TOMCAT_BASE_URL/tomcat-$TYPE_SOURCE_TOMCAT_VERSION/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz
+  TOMCAT_URL=$TOMCAT_BASE_URL/tomcat-$TYPE_SOURCE_TOMCAT_VERSION/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz  
 fi
+
+
 
 if [ "$VERBOSE" == "YES" ]; then
   echo "TYPE_SOURCE_TOMCAT = $TYPE_SOURCE_TOMCAT // TYPE_SOURCE_TOMCAT_PATH = $TYPE_SOURCE_TOMCAT_PATH // TYPE_SOURCE_TOMCAT_VERSION = $TYPE_SOURCE_TOMCAT_VERSION"
@@ -871,7 +816,7 @@ fi
 
 
 #------------
-# GetsourceBuilder
+# Plugin-GetSource
 #------------
 
 
@@ -896,7 +841,7 @@ fi
 
 
 #------------
-# PrebuildBuilder
+# Plugin-PreBuild
 #------------
 
 
@@ -906,7 +851,7 @@ fi
 
 
 #------------
-# BuildBuilder
+# Plugin-Build
 #------------
 
 
@@ -916,7 +861,7 @@ fi
 
 
 #------------
-# PostbuildBuilder
+# Plugin-PostBuild
 #------------
 
 
@@ -926,7 +871,7 @@ fi
 
 
 #------------
-# PrestartBuilder
+# Plugin-PreStart
 #------------
 
 
@@ -957,7 +902,7 @@ f_deploy
 
 
 #------------
-# StartBuilder
+# Plugin-Start
 #------------
 
 
@@ -968,6 +913,7 @@ if [ "$TYPE_SOURCE_TOMCAT" == "download" ]; then
   # start tomcat
   if [ ! -f ".tomcatPid" ]; then
     
+    export JAVA_OPTS="$JAVA_OPTS "
     ./localrun/apache-tomcat-$TOMCAT_VERSION/bin/startup.sh
     echo "download">.tomcatPid
   fi
@@ -982,7 +928,7 @@ if [ "$TYPE_SOURCE_TOMCAT" == "docker" ]; then
   if [ ! -f ".tomcatPid" ]; then
     
     dockerContainerIDtomcat=$(docker run --rm -d $dockerTomcatExtRef ${dockerAddLibRefs[@]} -p 8080:8080 \
-         \
+          \
         -v "$(pwd)/localrun/webapps":/usr/local/tomcat/webapps tomcat:$TYPE_SOURCE_TOMCAT_VERSION)
     echo "$dockerContainerIDtomcat">.tomcatPid
   else
@@ -1002,7 +948,7 @@ fi
 
 
 #------------
-# PoststartBuilder
+# Plugin-PostStart
 #------------
 
 
@@ -1012,8 +958,10 @@ fi
 
 
 #------------
-# LeaveCompBuilder
+# Plugin-LeaveComp
 #------------
+
+
 
 
 
@@ -1036,6 +984,7 @@ else
     f_deploy
   done
 fi
+
 
 
 
