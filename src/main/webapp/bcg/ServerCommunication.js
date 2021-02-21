@@ -18,7 +18,7 @@ define(["dojox/socket", "dojo/io-query", "dojo/_base/declare", "dojo/dom" ],
 					if(document.URL.indexOf('http://localhost:8080')==0) {
 						wsUrl="ws://localhost:8082";
 					} else {
-						wsUrl="ws://swlcg-ws.oglimmer.de";
+						wsUrl="wss://swlcg-ws.oglimmer.de";
 					}
 					var self = this;
 					this.queryObject = ioQuery.queryToObject(document.URL

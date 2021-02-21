@@ -18,7 +18,9 @@ public class ServletUtil {
 	}
 
 	public static Database getDatabase() {
-		Session s = new Session("localhost", 5984);
+		String couchdbHost = System.getProperty("couchdb", "localhost");
+		System.out.println("Using " + couchdbHost + " as couchdb host");
+		Session s = new Session(couchdbHost, 5984);
 		return s.getDatabase("swlcg");
 	}
 
