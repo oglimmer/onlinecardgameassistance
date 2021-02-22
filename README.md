@@ -1,9 +1,5 @@
-onlinecardgameassistance
-========================
+DO NOT USE THIS.
 
-Online card game assistance.
+DEPRECATED!!!
 
-Build notes
-===========
-
-use fulgens.
+THIS PROJECT HAS BEEN SUPERSEDED BY browsercardgame
