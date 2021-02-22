@@ -38,7 +38,7 @@ import de.oglimmer.bcg.util.JSONArrayList;
 
 public class SwlcgGameConfig implements GameConfig {
 
-	private static final String GENERATE_DECK_XML_URL = "http://swlcg.oglimmer.de/gen.groovy?affi=%s&cards=%s";
+	private static final String GENERATE_DECK_XML_URL = "https://swlcg.oglimmer.de/deckbuilder/gen.groovy?affi=%s&cards=%s";
 
 	private static final Logger log = LoggerFactory
 			.getLogger(SwlcgGameConfig.class);
